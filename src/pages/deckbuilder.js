@@ -143,6 +143,8 @@ export function renderDeckBuilder() {
 }
 
 function attachDeckEvents() {
+      const grid = document.getElementById('card-grid')
+  const savedScroll = grid ? grid.scrollTop : 0
   // Search
   document.getElementById('filter-search')?.addEventListener('input', e => {
     filters.search = e.target.value
@@ -169,9 +171,14 @@ function attachDeckEvents() {
       if (!card) return
       if (deck.length >= DECK_SIZE) return
       if (countInDeck(id) >= MAX_COPIES) return
+      const scrollPos = document.getElementById('card-grid')?.scrollTop || 0
       deck.push(card)
       saveDeck(deck)
       renderDeckBuilder()
+      requestAnimationFrame(() => {
+        const newGrid = document.getElementById('card-grid')
+        if (newGrid) newGrid.scrollTop = scrollPos
+      })
     })
   })
 
