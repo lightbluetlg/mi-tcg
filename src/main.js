@@ -131,7 +131,91 @@ export function renderBoard() {
   attachEvents()
 }
 
+// ── TOOLTIP
+function showTooltip(card, el) {
+  removeTooltip()
+  const rarityLabels = { uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' }
+  const rarityColors = { uncommon: '#6ee7b7', rare: '#93c5fd', epic: '#c4b5fd', legendary: '#fcd34d' }
+
+  const tooltip = document.createElement('div')
+  tooltip.className = `card-tooltip rarity-border-${card.rarity}`
+  tooltip.id = 'card-tooltip'
+  tooltip.innerHTML = `
+    <div class="tooltip-art">
+      <img src="/cards/${card.image}" alt="${card.name}" />
+      <div class="tooltip-art-vignette"></div>
+      <div class="tooltip-frame">
+        <img src="/${rarityFrames[card.rarity]}" alt="" />
+      </div>
+      <div class="tooltip-mana">${card.mana}</div>
+    </div>
+    <div class="tooltip-body">
+      <div class="tooltip-name">${card.name}</div>
+      <div class="tooltip-rarity" style="color:${rarityColors[card.rarity]}">${rarityLabels[card.rarity]}</div>
+      <div class="tooltip-stats">
+        <div class="tooltip-stat attack">
+          <span class="ts-icon">⚔️</span>
+          <span class="ts-label">Attack</span>
+          <span class="ts-value">${card.attack}</span>
+        </div>
+        <div class="tooltip-stat hp">
+          <span class="ts-icon">🩸</span>
+          <span class="ts-label">HP</span>
+          <span class="ts-value">${card.currentHp !== undefined ? card.currentHp : card.hp}</span>
+        </div>
+        <div class="tooltip-stat mana">
+          <span class="ts-icon">💧</span>
+          <span class="ts-label">Mana</span>
+          <span class="ts-value">${card.mana}</span>
+        </div>
+      </div>
+      <div class="tooltip-keywords">
+        <div class="tooltip-section-title">Keywords</div>
+        <div class="tooltip-keyword-list">${card.keywords ? card.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('') : '<span class="no-keywords">No abilities yet</span>'}</div>
+      </div>
+      <div class="tooltip-lore">
+        <div class="tooltip-section-title">Lore</div>
+        <div class="tooltip-lore-text">${card.lore || 'Ancient and mysterious, this creature\'s origins are lost to time...'}</div>
+      </div>
+    </div>
+  `
+
+  document.body.appendChild(tooltip)
+
+  const rect = el.getBoundingClientRect()
+  const tooltipWidth = 260
+  const tooltipHeight = 420
+  let left = rect.right + 12
+  let top = rect.top - 40
+
+  if (left + tooltipWidth > window.innerWidth) left = rect.left - tooltipWidth - 12
+  if (top + tooltipHeight > window.innerHeight) top = window.innerHeight - tooltipHeight - 60
+  if (top < 8) top = 8
+
+  tooltip.style.left = `${left}px`
+  tooltip.style.top = `${top}px`
+}
+
+function removeTooltip() {
+  document.getElementById('card-tooltip')?.remove()
+}
+
+// ── ATTACH EVENTS
 function attachEvents() {
+  // Tooltips
+  document.querySelectorAll('.card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const uid = parseInt(el.dataset.uid)
+      const card =
+        gameState.player.hand.find(c => c.uid === uid) ||
+        gameState.player.board.find(c => c.uid === uid) ||
+        gameState.opponent.board.find(c => c.uid === uid)
+      if (card) showTooltip(card, el)
+    })
+    el.addEventListener('mouseleave', removeTooltip)
+  })
+
+  // Play card from hand
   document.querySelectorAll('.card[data-context="hand"]').forEach(el => {
     el.addEventListener('click', () => {
       const uid = parseInt(el.dataset.uid)
@@ -140,6 +224,7 @@ function attachEvents() {
     })
   })
 
+  // Attack with board card
   document.querySelectorAll('.card[data-context="board"]').forEach(el => {
     el.addEventListener('click', () => {
       const uid = parseInt(el.dataset.uid)
@@ -148,6 +233,7 @@ function attachEvents() {
     })
   })
 
+  // Attack opponent hero
   document.getElementById('opponent-hero')?.addEventListener('click', () => {
     if (gameState.selectedCard && gameState.phase === 'attack' && gameState.turn === 'player') {
       const attacker = gameState.selectedCard
@@ -160,6 +246,7 @@ function attachEvents() {
     }
   })
 
+  // Phase buttons
   document.getElementById('btn-attack-phase')?.addEventListener('click', () => {
     gameState.phase = 'attack'
     gameState.log.push('⚔️ Attack phase started.')
@@ -171,7 +258,9 @@ function attachEvents() {
     renderBoard()
   })
 
+  // Navigation
   document.getElementById('btn-back-menu')?.addEventListener('click', () => {
+    removeTooltip()
     router.go('menu')
   })
 
@@ -180,16 +269,17 @@ function attachEvents() {
   })
 
   document.getElementById('btn-menu')?.addEventListener('click', () => {
+    removeTooltip()
     router.go('menu')
   })
 }
 
 // ── ROUTER
 router.onChange((page) => {
+  removeTooltip()
   if (page === 'menu') renderMenu()
   if (page === 'deckbuilder') renderDeckBuilder()
   if (page === 'game') {
-    // Reset game state by reloading game module
     import('./game.js').then(m => {
       Object.assign(gameState, m.freshGame())
       renderBoard()
