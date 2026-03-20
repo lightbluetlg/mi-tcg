@@ -6,7 +6,7 @@ import { renderPreMatch } from './pages/prematch.js'
 import { gameState, playCard, attackWithCard, endTurn, checkWin } from './game.js'
 import { allCards } from './cards.js'
 import { playSound, toggleMute, isMuted } from './audio.js'
-export const BASE = import.meta.env.BASE_URL
+export const BASE = '/mi-tcg/'
 
 const rarityFrames = {
   uncommon:  'RavenCard_Green_Frame.png',
@@ -35,11 +35,11 @@ export function renderCard(card, context = 'hand') {
         <span class="sparkle">✦</span>
       </div>` : ''}
       <div class="card-image">
-        <img src="/cards/${card.image}" alt="${card.name}" />
+        <img src="${BASE}cards/${card.image}" alt="${card.name}" />
         <div class="art-vignette"></div>
       </div>
       <div class="card-frame">
-        <img src="/${rarityFrames[card.rarity]}" alt="frame" />
+        <img src="${BASE}${rarityFrames[card.rarity]}" alt="frame" />
       </div>
       <div class="card-mana">${card.mana}</div>
       <div class="card-name">${card.name}</div>
@@ -159,10 +159,10 @@ function showTooltip(card, el) {
   tooltip.id = 'card-tooltip'
   tooltip.innerHTML = `
     <div class="tooltip-art">
-      <img src="/cards/${card.image}" alt="${card.name}" />
+      <img src="${BASE}cards/${card.image}" alt="${card.name}" />
       <div class="tooltip-art-vignette"></div>
       <div class="tooltip-frame">
-        <img src="/${rarityFrames[card.rarity]}" alt="" />
+        <img src="${BASE}${rarityFrames[card.rarity]}" alt="" />
       </div>
       <div class="tooltip-mana">${card.mana}</div>
     </div>
@@ -309,9 +309,9 @@ function renderGraveyardOverlay() {
             : graveyard.map(card => `
               <div class="graveyard-card rarity-${card.rarity}">
                 <div class="thumb-image" style="width:80px;height:107px;position:relative;border-radius:6px;overflow:hidden;">
-                  <img src="/cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
+                  <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
                   <div class="thumb-frame" style="position:absolute;inset:0;">
-                    <img src="/${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
+                    <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
                   </div>
                   <div style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a5fa0,#0a2040);border:1px solid #90cdf4;display:flex;align-items:center;justify-content:center;font-family:Barlow,sans-serif;font-size:10px;font-weight:700;color:#fff;z-index:10;">${card.mana}</div>
                 </div>
@@ -346,7 +346,7 @@ export function animateCardPlayedFromHand(card, isOpponent = false) {
 
     clone.innerHTML = `
       <div class="card-image" style="position:absolute;inset:0;border-radius:8px;overflow:hidden;z-index:1;">
-        <img src="/cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="card-frame" style="position:absolute;inset:0;z-index:5;pointer-events:none;">
         <img src="/${rarityFrame}" style="width:100%;height:100%;object-fit:fill;" />
