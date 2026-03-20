@@ -260,6 +260,69 @@ export function animateHeroHit(side) {
   floatDamage('💥', el)
   setTimeout(() => el.classList.remove('hero-shake', 'hero-hit'), 500)
 }
+
+export function animateCardPlayedFromHand(card, isOpponent = false) {
+  return new Promise(resolve => {
+    const rarityFrame = rarityFrames[card.rarity]
+
+    // Create a floating card clone
+    const clone = document.createElement('div')
+    clone.className = `card rarity-${card.rarity}`
+    clone.style.cssText = `
+      position: fixed;
+      width: ${isOpponent ? '60px' : '80px'};
+      height: ${isOpponent ? '84px' : '112px'};
+      z-index: 300;
+      pointer-events: none;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+    `
+
+    clone.innerHTML = `
+      <div class="card-image" style="position:absolute;inset:0;border-radius:8px;overflow:hidden;z-index:1;">
+        <img src="/cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="card-frame" style="position:absolute;inset:0;z-index:5;pointer-events:none;">
+        <img src="/${rarityFrame}" style="width:100%;height:100%;object-fit:fill;" />
+      </div>
+    `
+
+    // Position it where the hand card is
+    const handArea = document.querySelector(isOpponent ? '.opponent-hand' : '.player-hand')
+    const boardArea = document.querySelector(isOpponent ? '.opponent-field' : '.player-field')
+
+    if (!handArea || !boardArea) return resolve()
+
+    const handRect = handArea.getBoundingClientRect()
+    const boardRect = boardArea.getBoundingClientRect()
+
+    // Start position — center of hand area
+    clone.style.left = `${handRect.left + handRect.width / 2 - (isOpponent ? 30 : 40)}px`
+    clone.style.top  = `${handRect.top}px`
+
+    document.body.appendChild(clone)
+
+    // Calculate slide distance
+    const deltaY = boardRect.top - handRect.top
+
+    // Animate
+    clone.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease'
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        clone.style.transform = `translateY(${deltaY}px) scale(1.15)`
+        clone.style.opacity = '0.9'
+        setTimeout(() => {
+          clone.style.opacity = '0'
+          setTimeout(() => {
+            clone.remove()
+            resolve()
+          }, 400)
+        }, 350)
+      })
+    })
+  })
+}
 // ── ATTACH EVENTS
 function attachEvents() {
   // Tooltips
