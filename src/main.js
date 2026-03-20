@@ -4,6 +4,7 @@ import { renderMenu } from './pages/menu.js'
 import { renderDeckBuilder, getSavedDeck } from './pages/deckbuilder.js'
 import { gameState, playCard, attackWithCard, endTurn, checkWin } from './game.js'
 import { allCards } from './cards.js'
+import { playSound, toggleMute, isMuted } from './audio.js'
 
 const rarityFrames = {
   uncommon:  'RavenCard_Green_Frame.png',
@@ -85,6 +86,7 @@ export function renderBoard() {
         </div>
         <div class="action-buttons">
           <button class="btn-back-menu" id="btn-back-menu">🏠 Menu</button>
+          <button class="btn-mute" id="btn-mute">${isMuted() ? '🔇' : '🔊'}</button>
           ${gs.turn === 'player' ? `
             ${gs.phase === 'play' ? `<button class="btn-phase" id="btn-attack-phase">Attack Phase →</button>` : ''}
             ${gs.phase === 'attack' ? `<button class="btn-end-turn" id="btn-end-turn">End Turn ⏭</button>` : ''}
@@ -298,6 +300,7 @@ function attachEvents() {
       gameState.opponent.hp -= attacker.attack
       attacker.exhausted = true
       animateHeroHit('opponent')
+      playSound('attack')
       gameState.log.push(`⚔️ ${attacker.name} struck the opponent hero for ${attacker.attack} damage!`)
       gameState.selectedCard = null
       checkWin()
@@ -306,6 +309,11 @@ function attachEvents() {
   })
 
   // Phase buttons
+  document.getElementById('btn-mute')?.addEventListener('click', () => {
+    toggleMute()
+    renderBoard()
+  })
+
   document.getElementById('btn-attack-phase')?.addEventListener('click', () => {
     gameState.phase = 'attack'
     gameState.log.push('⚔️ Attack phase started.')

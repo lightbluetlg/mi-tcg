@@ -1,5 +1,6 @@
 import { animateCardHit, animateCardDeath, animateCardLunge, animateHeroHit, animateCardPlayed, floatDamage } from './main.js'
 import { allCards } from './cards.js'
+import { playSound } from './audio.js'
 
 // ── HELPERS
 let uidCounter = 1
@@ -106,6 +107,7 @@ export function playCard(uid) {
   card.exhausted = false
   gameState.player.board.push(card)
   gameState.log.push(`▶️ You played ${card.name}.`)
+  playSound('card_play')
   setTimeout(() => animateCardPlayed(card.uid), 50)
 }
 
@@ -149,7 +151,8 @@ async function resolveCombat(attacker, defender) {
   const attackerIsPlayer = !attacker.isOpponent
   await animateCardLunge(attacker.uid, attackerIsPlayer ? 'up' : 'down')
 
-  // Hit animations
+  // Hit animations + sound
+  playSound('attack')
   animateCardHit(defender.uid)
   animateCardHit(attacker.uid)
 
@@ -172,6 +175,7 @@ async function resolveCombat(attacker, defender) {
   if (defender.currentHp <= 0) { dyingUids.push(defender.uid); gameState.log.push(`💀 ${defender.name} died.`) }
 
   if (dyingUids.length > 0) {
+    playSound('death')
     await Promise.all(dyingUids.map(uid => animateCardDeath(uid)))
   }
 
@@ -251,6 +255,8 @@ async function opponentTurn() {
   gameState.player.board.forEach(c => { c.canAttack = true; c.exhausted = false })
   if (gameState.player.deck.length > 0) gameState.player.hand.push(gameState.player.deck.shift())
 
+  playSound('turn')
+  playSound('card_draw')
   gameState.log.push(`🎮 Your turn! Mana: ${gameState.player.mana}`)
 
   import('./main.js').then(m => m.renderBoard())
@@ -262,11 +268,13 @@ export function checkWin() {
     gameState.gameOver = true
     gameState.winner = 'player'
     gameState.log.push('🏆 You win!')
+    playSound('victory')
   }
   if (gameState.player.hp <= 0) {
     gameState.gameOver = true
     gameState.winner = 'opponent'
     gameState.log.push('💀 You lost!')
+    playSound('defeat')
   }
 }
 
