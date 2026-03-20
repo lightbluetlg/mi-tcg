@@ -281,11 +281,23 @@ router.onChange((page) => {
   if (page === 'deckbuilder') renderDeckBuilder()
   if (page === 'game') {
     import('./game.js').then(m => {
-      Object.assign(gameState, m.freshGame())
+      const fresh = m.freshGame()
+      Object.assign(gameState, fresh)
       renderBoard()
+      if (fresh._opponentGoesFirst) {
+        setTimeout(() => {
+          import('./game.js').then(g => g.triggerOpponentFirst())
+        }, 1200)
+      }
     })
   }
 })
+
+export function triggerOpponentFirst() {
+  if (gameState._opponentGoesFirst) {
+    opponentTurn()
+  }
+}
 
 // ── START
 renderMenu()
