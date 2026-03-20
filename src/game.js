@@ -224,23 +224,22 @@ async function opponentTurn() {
     }
   }
 
-  // Attack with eligible creatures
-  const attackPromises = []
-  opp.board.forEach(attacker => {
-    if (attacker.canAttack && !attacker.exhausted) {
-      if (gameState.player.board.length > 0) {
-        const target = gameState.player.board[Math.floor(Math.random() * gameState.player.board.length)]
-        attackPromises.push(resolveCombat(attacker, target))
-      } else {
-        gameState.player.hp -= attacker.attack
-        attacker.exhausted = true
-        animateHeroHit('player')
-        gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${attacker.attack}!`)
-        checkWin()
-      }
+  // Attack with eligible creatures one at a time
+  const attackers = [...opp.board.filter(c => c.canAttack && !c.exhausted)]
+  for (const attacker of attackers) {
+    if (attacker.currentHp <= 0) continue
+    if (gameState.player.board.length > 0) {
+      const target = gameState.player.board[Math.floor(Math.random() * gameState.player.board.length)]
+      await resolveCombat(attacker, target)
+    } else {
+      gameState.player.hp -= attacker.attack
+      attacker.exhausted = true
+      animateHeroHit('player')
+      playSound('attack')
+      gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${attacker.attack}!`)
+      checkWin()
     }
-  })
-  await Promise.all(attackPromises)
+  }
 
   // Draw a card
   if (opp.deck.length > 0) opp.hand.push(opp.deck.shift())
