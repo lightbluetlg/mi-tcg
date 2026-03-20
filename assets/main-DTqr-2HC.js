@@ -236,11 +236,11 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <span class="sparkle">✦</span>
       </div>`:``}
       <div class="card-image">
-        <img src="/cards/${e.image}" alt="${e.name}" />
+        <img src="${H}cards/${e.image}" alt="${e.name}" />
         <div class="art-vignette"></div>
       </div>
       <div class="card-frame">
-        <img src="/${U[e.rarity]}" alt="frame" />
+        <img src="${H}${U[e.rarity]}" alt="frame" />
       </div>
       <div class="card-mana">${e.mana}</div>
       <div class="card-name">${e.name}</div>
@@ -342,10 +342,10 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
     `:``}
   `,Me()}function De(e,t){K();let n={uncommon:`Uncommon`,rare:`Rare`,epic:`Epic`,legendary:`Legendary`},r={uncommon:`#6ee7b7`,rare:`#93c5fd`,epic:`#c4b5fd`,legendary:`#fcd34d`},i=document.createElement(`div`);i.className=`card-tooltip rarity-border-${e.rarity}`,i.id=`card-tooltip`,i.innerHTML=`
     <div class="tooltip-art">
-      <img src="/cards/${e.image}" alt="${e.name}" />
+      <img src="${H}cards/${e.image}" alt="${e.name}" />
       <div class="tooltip-art-vignette"></div>
       <div class="tooltip-frame">
-        <img src="/${U[e.rarity]}" alt="" />
+        <img src="${H}${U[e.rarity]}" alt="" />
       </div>
       <div class="tooltip-mana">${e.mana}</div>
     </div>
@@ -389,9 +389,9 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
           ${e.length===0?`<div class="graveyard-empty">No dead creatures yet</div>`:e.map(e=>`
               <div class="graveyard-card rarity-${e.rarity}">
                 <div class="thumb-image" style="width:80px;height:107px;position:relative;border-radius:6px;overflow:hidden;">
-                  <img src="/cards/${e.image}" style="width:100%;height:100%;object-fit:cover;" />
+                  <img src="${H}cards/${e.image}" style="width:100%;height:100%;object-fit:cover;" />
                   <div class="thumb-frame" style="position:absolute;inset:0;">
-                    <img src="/${U[e.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
+                    <img src="${H}${U[e.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
                   </div>
                   <div style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a5fa0,#0a2040);border:1px solid #90cdf4;display:flex;align-items:center;justify-content:center;font-family:Barlow,sans-serif;font-size:10px;font-weight:700;color:#fff;z-index:10;">${e.mana}</div>
                 </div>
@@ -413,7 +413,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
       background: #000;
     `,i.innerHTML=`
       <div class="card-image" style="position:absolute;inset:0;border-radius:8px;overflow:hidden;z-index:1;">
-        <img src="/cards/${e.image}" style="width:100%;height:100%;object-fit:cover;" />
+        <img src="${H}cards/${e.image}" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="card-frame" style="position:absolute;inset:0;z-index:5;pointer-events:none;">
         <img src="/${r}" style="width:100%;height:100%;object-fit:fill;" />
