@@ -1,12 +1,13 @@
 // ── AUDIO SYSTEM
+const BASE = import.meta.env.BASE_URL
 const sounds = {
-  card_play:  new Audio('/sounds/card_play.wav'),
-  attack:     new Audio('/sounds/attack.wav'),
-  death:      new Audio('/sounds/death.wav'),
-  victory:    new Audio('/sounds/victory.wav'),
-  defeat:     new Audio('/sounds/defeat.mp3'),
-  card_draw:  new Audio('/sounds/card_draw.mp3'),
-  turn:       new Audio('/sounds/turn.wav'),
+  card_play:  new Audio(`${BASE}sounds/card_play.wav`),
+  attack:     new Audio(`${BASE}sounds/attack.wav`),
+  death:      new Audio(`${BASE}sounds/death.wav`),
+  victory:    new Audio(`${BASE}sounds/victory.wav`),
+  defeat:     new Audio(`${BASE}sounds/defeat.mp3`),
+  card_draw:  new Audio(`${BASE}sounds/card_draw.mp3`),
+  turn:       new Audio(`${BASE}sounds/turn.wav`),
 }
 
 // Preload all sounds

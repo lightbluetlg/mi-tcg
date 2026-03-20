@@ -6,6 +6,7 @@ import { renderPreMatch } from './pages/prematch.js'
 import { gameState, playCard, attackWithCard, endTurn, checkWin } from './game.js'
 import { allCards } from './cards.js'
 import { playSound, toggleMute, isMuted } from './audio.js'
+export const BASE = import.meta.env.BASE_URL
 
 const rarityFrames = {
   uncommon:  'RavenCard_Green_Frame.png',
