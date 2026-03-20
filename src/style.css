@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Poppins:wght@300;400;600;700&family=Passion+One:wght@400;700&family=Barlow:wght@400;600;700&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -9,7 +9,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: 'Poppins', sans-serif;
   overflow: hidden;
 }
 
@@ -34,13 +34,8 @@ body {
   gap: 6px;
 }
 
-.opponent-area {
-  flex-direction: column;
-}
-
-.player-area-bottom {
-  flex-direction: column-reverse;
-}
+.opponent-area { flex-direction: column; }
+.player-area-bottom { flex-direction: column-reverse; }
 
 /* ══════════════════════════════
    HERO INFO
@@ -61,6 +56,8 @@ body {
   border-radius: 8px;
   padding: 6px 14px;
   box-shadow: 0 0 12px rgba(201,168,76,0.2);
+  cursor: default;
+  transition: all 0.2s;
 }
 
 .attackable-hero {
@@ -86,17 +83,17 @@ body {
 }
 
 .hero-name {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
+  font-family: 'Passion One', sans-serif;
+  font-size: 15px;
   font-weight: 700;
   color: #c9a84c;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
 .hero-hp {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 16px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 17px;
   font-weight: 700;
   color: #ff6b6b;
   text-shadow: 0 0 10px rgba(255,80,80,0.6);
@@ -114,15 +111,18 @@ body {
 }
 
 .mana-label {
+  font-family: 'Poppins', sans-serif;
   font-size: 8px;
+  font-weight: 600;
   color: #93c5fd;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
 .mana-value {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 16px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
   color: #60a5fa;
   text-shadow: 0 0 10px rgba(96,165,250,0.7);
 }
@@ -144,10 +144,11 @@ body {
 
 .empty-field-hint {
   color: rgba(255,255,255,0.15);
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
+  font-weight: 300;
   letter-spacing: 2px;
   text-transform: uppercase;
-  font-family: 'Cinzel', serif;
 }
 
 /* ══════════════════════════════
@@ -162,7 +163,7 @@ body {
 }
 
 /* ══════════════════════════════
-   CARD BACK (opponent hand)
+   CARD BACK
 ══════════════════════════════ */
 .card-back {
   width: 60px;
@@ -186,33 +187,29 @@ body {
   border-bottom: 1px solid rgba(201,168,76,0.15);
 }
 
-.turn-info {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
+.turn-info { display: flex; gap: 16px; align-items: center; }
 
 .turn-label {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
+  font-family: 'Passion One', sans-serif;
+  font-size: 15px;
   font-weight: 700;
   color: #fcd34d;
+  letter-spacing: 2px;
   text-shadow: 0 0 8px rgba(252,211,77,0.5);
 }
 
 .phase-label {
-  font-size: 11px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
   color: rgba(255,255,255,0.4);
   letter-spacing: 1px;
 }
 
-.action-buttons {
-  display: flex;
-  gap: 10px;
-}
+.action-buttons { display: flex; gap: 10px; align-items: center; }
 
 .btn-phase, .btn-end-turn {
-  font-family: 'Cinzel', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -230,7 +227,6 @@ body {
   border: 1px solid #3b82f6;
   box-shadow: 0 0 10px rgba(59,130,246,0.3);
 }
-
 .btn-phase:hover {
   background: linear-gradient(135deg, #2563eb, #3b82f6);
   box-shadow: 0 0 18px rgba(59,130,246,0.5);
@@ -242,10 +238,28 @@ body {
   border: 1px solid #c9a84c;
   box-shadow: 0 0 10px rgba(201,168,76,0.3);
 }
-
 .btn-end-turn:hover {
   background: linear-gradient(135deg, #b45309, #d97706);
   box-shadow: 0 0 18px rgba(201,168,76,0.5);
+}
+
+.btn-back-menu {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  background: rgba(0,0,0,0.4);
+  color: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+.btn-back-menu:hover {
+  color: #c9a84c;
+  border-color: #c9a84c;
 }
 
 /* ══════════════════════════════
@@ -266,12 +280,13 @@ body {
 .log-entry {
   background: rgba(0,0,0,0.75);
   color: rgba(255,255,255,0.7);
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
+  font-weight: 400;
   padding: 4px 10px;
   border-radius: 4px;
   border-left: 2px solid #c9a84c;
-  font-family: 'Cinzel', serif;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 /* ══════════════════════════════
@@ -294,26 +309,33 @@ body {
   padding: 48px 64px;
   text-align: center;
   box-shadow: 0 0 60px rgba(201,168,76,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .game-over-title {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 42px;
+  font-family: 'Passion One', sans-serif;
+  font-size: 56px;
+  font-weight: 700;
   color: #fcd34d;
+  letter-spacing: 4px;
   text-shadow: 0 0 20px rgba(252,211,77,0.6);
-  margin-bottom: 12px;
 }
 
 .game-over-sub {
+  font-family: 'Poppins', sans-serif;
   font-size: 14px;
+  font-weight: 300;
   color: rgba(255,255,255,0.5);
-  letter-spacing: 2px;
-  margin-bottom: 32px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
 }
 
 .btn-restart {
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 2px;
   padding: 12px 36px;
@@ -325,7 +347,6 @@ body {
   text-transform: uppercase;
   transition: all 0.2s;
 }
-
 .btn-restart:hover {
   background: linear-gradient(135deg, #b45309, #d97706);
   box-shadow: 0 0 20px rgba(201,168,76,0.4);
@@ -335,8 +356,8 @@ body {
    BASE CARD
 ══════════════════════════════ */
 .card {
-  width: 110px;
-  height: 170px;
+  width: 130px;
+  height: 200px;
   border-radius: 8px;
   cursor: pointer;
   position: relative;
@@ -346,38 +367,15 @@ body {
   flex-shrink: 0;
 }
 
-.hand-area .card {
-  width: 120px;
-  height: 185px;
-}
+.hand-area .card { width: 145px; height: 220px; }
+.card:hover { transform: translateY(-12px) scale(1.05); }
+.hand-area .card:hover { transform: translateY(-20px) scale(1.08); }
 
-.card:hover {
-  transform: translateY(-12px) scale(1.05);
-}
+.card.playable { filter: drop-shadow(0 0 8px rgba(252,211,77,0.7)); }
+.card.can-attack { filter: drop-shadow(0 0 8px rgba(255,80,80,0.7)); cursor: crosshair; }
+.card.selected { filter: drop-shadow(0 0 14px rgba(255,220,50,1)); transform: translateY(-16px) scale(1.08); }
+.card.exhausted { filter: brightness(0.5) grayscale(0.5); }
 
-.hand-area .card:hover {
-  transform: translateY(-20px) scale(1.08);
-}
-
-.card.playable {
-  filter: drop-shadow(0 0 8px rgba(252,211,77,0.7));
-}
-
-.card.can-attack {
-  filter: drop-shadow(0 0 8px rgba(255,80,80,0.7));
-  cursor: crosshair;
-}
-
-.card.selected {
-  filter: drop-shadow(0 0 14px rgba(255,220,50,1));
-  transform: translateY(-16px) scale(1.08);
-}
-
-.card.exhausted {
-  filter: brightness(0.5) grayscale(0.5);
-}
-
-/* Rarity glow */
 .rarity-uncommon:hover  { filter: drop-shadow(0 0 10px rgba(52,211,153,0.6)); }
 .rarity-rare:hover      { filter: drop-shadow(0 0 10px rgba(96,165,250,0.6)); }
 .rarity-epic:hover      { filter: drop-shadow(0 0 10px rgba(167,139,250,0.6)); }
@@ -397,12 +395,7 @@ body {
   z-index: 1;
 }
 
-.card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+.card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .art-vignette {
   position: absolute;
@@ -418,24 +411,19 @@ body {
   border-radius: 8px;
 }
 
-.card-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  display: block;
-}
+.card-frame img { width: 100%; height: 100%; object-fit: fill; display: block; }
 
 .card-mana {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Barlow', sans-serif;
   font-weight: 700;
   font-size: 13px;
   color: #fff;
@@ -456,19 +444,18 @@ body {
 
 .card-name {
   position: absolute;
-  bottom: 26px;
+  bottom: 28px;
   left: 4px;
   right: 4px;
   z-index: 20;
   text-align: center;
-  font-family: 'Cinzel', serif;
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-family: 'Passion One', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.2;
   padding: 3px 4px;
   border-radius: 2px;
   background: rgba(0,0,0,0.6);
@@ -476,10 +463,7 @@ body {
   text-shadow: 0 1px 2px rgba(0,0,0,0.9);
 }
 
-.hand-area .card-name {
-  font-size: 8px;
-  bottom: 30px;
-}
+.hand-area .card-name { font-size: 10px; bottom: 32px; }
 
 .rarity-uncommon  .card-name { color: #6ee7b7; }
 .rarity-rare      .card-name { color: #93c5fd; }
@@ -501,8 +485,8 @@ body {
   display: flex;
   align-items: center;
   gap: 3px;
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 13px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
   font-weight: 700;
   padding: 2px 6px 3px;
   border-radius: 4px;
@@ -510,10 +494,7 @@ body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.9);
 }
 
-.hand-area .stat-badge {
-  font-size: 15px;
-  padding: 3px 8px 4px;
-}
+.hand-area .stat-badge { font-size: 16px; padding: 3px 8px 4px; }
 
 .badge-icon  { font-size: 10px; line-height: 1; }
 .badge-value { line-height: 1; }
@@ -576,29 +557,29 @@ body {
   z-index: 2;
 }
 
-.menu-logo {
-  text-align: center;
-}
+.menu-logo { text-align: center; }
 
 .logo-title {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 64px;
+  font-family: 'Passion One', sans-serif;
+  font-size: 72px;
   font-weight: 700;
   color: #fcd34d;
+  letter-spacing: 6px;
+  text-transform: uppercase;
   text-shadow:
     0 0 20px rgba(252,211,77,0.8),
     0 0 60px rgba(252,211,77,0.3),
     0 4px 8px rgba(0,0,0,0.9);
-  letter-spacing: 4px;
 }
 
 .logo-sub {
-  font-family: 'Cinzel', serif;
-  font-size: 16px;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 8px;
   text-transform: uppercase;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .menu-buttons {
@@ -609,8 +590,9 @@ body {
 }
 
 .menu-section-title {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
   color: rgba(255,255,255,0.3);
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -648,62 +630,36 @@ body {
   box-shadow: 0 0 30px rgba(201,168,76,0.5), 0 4px 16px rgba(0,0,0,0.4);
 }
 
-.menu-btn.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.menu-btn.disabled { opacity: 0.4; cursor: not-allowed; }
 
-.btn-icon {
-  font-size: 28px;
-  width: 40px;
-  text-align: center;
-}
+.btn-icon { font-size: 28px; width: 40px; text-align: center; }
 
-.btn-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.btn-text { display: flex; flex-direction: column; gap: 2px; }
 
 .btn-label {
-  font-family: 'Cinzel', serif;
-  font-size: 15px;
-  font-weight: 700;
+  font-family: 'Passion One', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
   color: #f0d080;
-  letter-spacing: 1px;
-}
-
-.btn-desc {
-  font-size: 11px;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 0.5px;
-}
-
-.menu-footer {
-  font-size: 11px;
-  color: rgba(255,255,255,0.2);
   letter-spacing: 2px;
-  font-family: 'Cinzel', serif;
-}
-
-.btn-back-menu {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 6px 14px;
-  background: rgba(0,0,0,0.4);
-  color: rgba(255,255,255,0.5);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
   text-transform: uppercase;
 }
 
-.btn-back-menu:hover {
-  color: #c9a84c;
-  border-color: #c9a84c;
+.btn-desc {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.3px;
+}
+
+.menu-footer {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
 /* ══════════════════════════════
@@ -735,11 +691,12 @@ body {
 }
 
 .panel-title {
-  font-family: 'Cinzel', serif;
-  font-size: 16px;
-  font-weight: 700;
+  font-family: 'Passion One', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
   color: #fcd34d;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
 .filters {
@@ -756,18 +713,13 @@ body {
   border: 1px solid rgba(201,168,76,0.3);
   border-radius: 6px;
   color: #fff;
-  font-family: 'Cinzel', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 12px;
   outline: none;
 }
 
-.filter-search:focus {
-  border-color: #c9a84c;
-}
-
-.filter-search::placeholder {
-  color: rgba(255,255,255,0.3);
-}
+.filter-search:focus { border-color: #c9a84c; }
+.filter-search::placeholder { color: rgba(255,255,255,0.3); }
 
 .filter-select {
   padding: 6px 10px;
@@ -775,20 +727,19 @@ body {
   border: 1px solid rgba(201,168,76,0.3);
   border-radius: 6px;
   color: #fff;
-  font-family: 'Cinzel', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
   outline: none;
   cursor: pointer;
 }
 
-.filter-select:focus {
-  border-color: #c9a84c;
-}
+.filter-select:focus { border-color: #c9a84c; }
 
 .collection-count {
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
+  font-weight: 300;
   color: rgba(255,255,255,0.3);
-  font-family: 'Cinzel', serif;
   letter-spacing: 1px;
 }
 
@@ -809,14 +760,8 @@ body {
   position: relative;
 }
 
-.thumb-card:hover:not(.maxed) {
-  transform: translateY(-6px) scale(1.05);
-}
-
-.thumb-card.maxed {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
+.thumb-card:hover:not(.maxed) { transform: translateY(-6px) scale(1.05); }
+.thumb-card.maxed { opacity: 0.45; cursor: not-allowed; }
 
 .thumb-image {
   position: relative;
@@ -834,18 +779,8 @@ body {
   display: block;
 }
 
-.thumb-frame {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.thumb-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  display: block;
-}
+.thumb-frame { position: absolute; inset: 0; pointer-events: none; }
+.thumb-frame img { width: 100%; height: 100%; object-fit: fill; display: block; }
 
 .thumb-mana {
   position: absolute;
@@ -859,7 +794,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Barlow', sans-serif;
   font-size: 10px;
   font-weight: 700;
   color: #fff;
@@ -873,7 +808,7 @@ body {
   right: 2px;
   background: rgba(0,0,0,0.85);
   color: #fcd34d;
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Barlow', sans-serif;
   font-size: 11px;
   font-weight: 700;
   padding: 1px 5px;
@@ -883,20 +818,23 @@ body {
 }
 
 .thumb-name {
-  font-family: 'Cinzel', serif;
-  font-size: 8px;
-  font-weight: 700;
+  font-family: 'Passion One', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
   color: #f0d080;
   text-align: center;
   margin-top: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .thumb-stats {
-  font-size: 9px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
   text-align: center;
   color: rgba(255,255,255,0.5);
   margin-top: 2px;
@@ -919,8 +857,9 @@ body {
 }
 
 .deck-count {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 18px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
   color: rgba(255,255,255,0.4);
 }
 
@@ -929,17 +868,14 @@ body {
   text-shadow: 0 0 10px rgba(104,211,145,0.6);
 }
 
-.deck-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-}
+.deck-list { flex: 1; overflow-y: auto; padding: 8px 0; }
 
 .deck-empty {
   text-align: center;
   color: rgba(255,255,255,0.2);
-  font-family: 'Cinzel', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 12px;
+  font-weight: 300;
   padding: 40px 20px;
   letter-spacing: 1px;
 }
@@ -953,9 +889,7 @@ body {
   transition: background 0.15s;
 }
 
-.deck-entry:hover {
-  background: rgba(255,255,255,0.04);
-}
+.deck-entry:hover { background: rgba(255,255,255,0.04); }
 
 .deck-entry-mana {
   width: 22px;
@@ -966,7 +900,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Barlow', sans-serif;
   font-size: 10px;
   font-weight: 700;
   color: #fff;
@@ -976,9 +910,11 @@ body {
 
 .deck-entry-name {
   flex: 1;
-  font-family: 'Cinzel', serif;
-  font-size: 10px;
-  font-weight: 700;
+  font-family: 'Passion One', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -990,8 +926,9 @@ body {
 .rarity-legendary .deck-entry-name { color: #fcd34d; }
 
 .deck-entry-count {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 12px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
   color: rgba(255,255,255,0.4);
   flex-shrink: 0;
 }
@@ -1022,7 +959,7 @@ body {
 }
 
 .btn-save-deck {
-  font-family: 'Cinzel', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -1046,9 +983,9 @@ body {
 }
 
 .btn-clear-deck {
-  font-family: 'Cinzel', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 1px;
   padding: 8px;
   border-radius: 6px;
@@ -1067,9 +1004,9 @@ body {
 }
 
 .btn-back {
-  font-family: 'Cinzel', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 1px;
   padding: 8px;
   border-radius: 6px;
