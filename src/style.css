@@ -1214,3 +1214,8 @@ body {
   line-height: 1.6;
   font-style: italic;
 }
+
+.filter-select option {
+  background: #1a1a2e;
+  color: #fff;
+}
