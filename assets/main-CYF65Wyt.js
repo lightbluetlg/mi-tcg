@@ -103,59 +103,98 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
       </div>
 
     </div>
-  `,ie()}function ie(){document.querySelectorAll(`.deck-slot-btn`).forEach(e=>{e.addEventListener(`click`,()=>{let t=parseInt(e.dataset.slot);m={search:``,rarity:`all`,mana:`all`},b(t)})}),document.getElementById(`deck-name-input`)?.addEventListener(`input`,e=>{g=e.target.value,u(p,h,g,_)}),document.getElementById(`filter-search`)?.addEventListener(`input`,e=>{m.search=e.target.value,b(p)}),document.getElementById(`filter-rarity`)?.addEventListener(`change`,e=>{m.rarity=e.target.value,b(p)}),document.getElementById(`filter-mana`)?.addEventListener(`change`,e=>{m.mana=e.target.value,b(p)}),document.getElementById(`btn-pick-cover`)?.addEventListener(`click`,()=>{v=!v,b(p)}),document.querySelectorAll(`.thumb-card`).forEach(e=>{e.addEventListener(`click`,()=>{let t=parseInt(e.dataset.id),n=r.find(e=>e.id===t);if(!n)return;if(v){_=t,v=!1,u(p,h,g,_),b(p);return}if(h.length>=a||y(t)>=i)return;let o=document.getElementById(`card-grid`)?.scrollTop||0;h.push(n),u(p,h,g,_),b(p),requestAnimationFrame(()=>{let e=document.getElementById(`card-grid`);e&&(e.scrollTop=o)})})}),document.querySelectorAll(`.deck-entry-remove`).forEach(e=>{e.addEventListener(`click`,t=>{t.stopPropagation();let n=parseInt(e.dataset.id),r=h.findIndex(e=>e.id===n);r!==-1&&h.splice(r,1),u(p,h,g,_),b(p)})}),document.getElementById(`btn-clear`)?.addEventListener(`click`,()=>{h=[],u(p,h,g,_),b(p)}),document.getElementById(`btn-back`)?.addEventListener(`click`,()=>{n.go(`menu`)})}function x(){let e=l(),t=e.some(e=>e.cards&&e.cards.length===20);document.querySelector(`#app`).innerHTML=`
-    <div class="menu-screen">
-      <div class="menu-content">
-        <div class="menu-logo">
-          <h1 class="logo-title">RavenClash</h1>
-          <div class="logo-sub">The Card Game</div>
+  `,ie()}function ie(){document.querySelectorAll(`.deck-slot-btn`).forEach(e=>{e.addEventListener(`click`,()=>{let t=parseInt(e.dataset.slot);m={search:``,rarity:`all`,mana:`all`},b(t)})}),document.getElementById(`deck-name-input`)?.addEventListener(`input`,e=>{g=e.target.value,u(p,h,g,_)}),document.getElementById(`filter-search`)?.addEventListener(`input`,e=>{m.search=e.target.value,b(p)}),document.getElementById(`filter-rarity`)?.addEventListener(`change`,e=>{m.rarity=e.target.value,b(p)}),document.getElementById(`filter-mana`)?.addEventListener(`change`,e=>{m.mana=e.target.value,b(p)}),document.getElementById(`btn-pick-cover`)?.addEventListener(`click`,()=>{v=!v,b(p)}),document.querySelectorAll(`.thumb-card`).forEach(e=>{e.addEventListener(`click`,()=>{let t=parseInt(e.dataset.id),n=r.find(e=>e.id===t);if(!n)return;if(v){_=t,v=!1,u(p,h,g,_),b(p);return}if(h.length>=a||y(t)>=i)return;let o=document.getElementById(`card-grid`)?.scrollTop||0;h.push(n),u(p,h,g,_),b(p),requestAnimationFrame(()=>{let e=document.getElementById(`card-grid`);e&&(e.scrollTop=o)})})}),document.querySelectorAll(`.deck-entry-remove`).forEach(e=>{e.addEventListener(`click`,t=>{t.stopPropagation();let n=parseInt(e.dataset.id),r=h.findIndex(e=>e.id===n);r!==-1&&h.splice(r,1),u(p,h,g,_),b(p)})}),document.getElementById(`btn-clear`)?.addEventListener(`click`,()=>{h=[],u(p,h,g,_),b(p)}),document.getElementById(`btn-back`)?.addEventListener(`click`,()=>{n.go(`menu`)})}var ae={uncommon:`RavenCard_Green_Frame.png`,rare:`RavenCard_Blue_Frame.png`,epic:`RavenCard_Purple_Frame.png`,legendary:`RavenCard_Frame.png`},x=[{id:`vs-ai`,label:`vs AI`,desc:`Battle the computer`,available:!0},{id:`vs-player`,label:`vs Player`,desc:`Challenge a friend`,available:!1}],S=`vs-ai`,C=null;function oe(){return localStorage.getItem(`ravenclash_player_name`)||`Traveler`}function se(e){localStorage.setItem(`ravenclash_player_name`,e)}function ce(e){return e.filter(e=>e.cards&&e.cards.length===20)}function w(){let e=l(),t=ce(e),n=oe();C===null&&t.length>0&&(C=t[0].slot);let i=e.find(e=>e.slot===C),a=S===`vs-ai`&&i&&i.cards&&i.cards.length===20;document.querySelector(`#app`).innerHTML=`
+    <div class="newmenu-screen">
+
+      <!-- TOP BAR -->
+      <div class="newmenu-topbar">
+        <div class="topbar-logo">RavenClash</div>
+        <div class="topbar-profile">
+          <div class="topbar-avatar">⚔️</div>
+          <div class="topbar-info">
+            <input class="topbar-name-input" id="topbar-name" value="${n}" maxlength="20" />
+            <div class="topbar-stats">${t.length} deck${t.length===1?``:`s`} ready</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="topbar-btn" id="btn-collection">📖 Collection</button>
+        </div>
+      </div>
+
+      <div class="newmenu-body">
+
+        <!-- LEFT SIDEBAR: Game Modes -->
+        <div class="newmenu-sidebar">
+          <div class="sidebar-title">Game Modes</div>
+          ${x.map(e=>`
+            <div class="sidebar-mode ${e.id===S?`active`:``} ${e.available?``:`coming-soon`}" data-mode="${e.id}">
+              <div class="mode-art">
+                ${t.length>0&&e.available?`
+                  <img src="/cards/${r[Math.floor(Math.random()*10)].image}" style="width:100%;height:100%;object-fit:cover;opacity:0.4;" />
+                `:``}
+              </div>
+              <div class="mode-info">
+                <div class="mode-label">${e.label}</div>
+                <div class="mode-desc">${e.available?e.desc:`Coming Soon`}</div>
+              </div>
+              ${e.id===S?`<div class="mode-active-bar"></div>`:``}
+            </div>
+          `).join(``)}
         </div>
 
-        <div class="menu-buttons">
-          <div class="menu-section-title">⚔️ Battle</div>
-          <button class="menu-btn primary ${t?``:`disabled`}" id="btn-vs-ai">
-            <span class="btn-icon">🤖</span>
-            <span class="btn-text">
-              <span class="btn-label">vs AI</span>
-              <span class="btn-desc">${t?`Choose your deck and fight`:`Build a deck first`}</span>
-            </span>
-          </button>
-          <button class="menu-btn disabled" id="btn-vs-player">
-            <span class="btn-icon">👥</span>
-            <span class="btn-text">
-              <span class="btn-label">vs Player</span>
-              <span class="btn-desc">Coming soon</span>
-            </span>
-          </button>
+        <!-- CENTER: Deck Selection + Play -->
+        <div class="newmenu-center">
+          <div class="center-title">
+            ${S===`vs-ai`?`🤖 vs AI — Select Your Deck`:`👥 vs Player — Coming Soon`}
+          </div>
 
-          <div class="menu-section-title" style="margin-top:24px">🃏 Collection</div>
-          <button class="menu-btn" id="btn-deck-builder">
-            <span class="btn-icon">📖</span>
-            <span class="btn-text">
-              <span class="btn-label">Deck Builder</span>
-              <span class="btn-desc">${t?`${e.filter(e=>e.cards&&e.cards.length===20).length} deck(s) ready`:`Build your 20-card deck`}</span>
-            </span>
-          </button>
-          <button class="menu-btn disabled" id="btn-card-packs">
-            <span class="btn-icon">📦</span>
-            <span class="btn-text">
-              <span class="btn-label">Card Packs</span>
-              <span class="btn-desc">Coming soon</span>
-            </span>
-          </button>
+          ${S===`vs-ai`?`
+            <div class="center-decks">
+              ${e.map(e=>{let t=e.cards&&e.cards.length===20,n=e.slot===C,i=e.coverId?r.find(t=>t.id===e.coverId):null,a=i?ae[i.rarity]:null;return`
+                  <div class="center-deck ${t?`ready`:`empty`} ${n?`selected`:``}" data-slot="${e.slot}">
+                    <div class="center-deck-art">
+                      ${i?`
+                        <img src="/cards/${i.image}" style="width:100%;height:100%;object-fit:cover;" />
+                        <div style="position:absolute;inset:0;">
+                          <img src="/${a}" style="width:100%;height:100%;object-fit:fill;" />
+                        </div>
+                      `:`<div class="center-deck-empty-art">?</div>`}
+                      ${n?`<div class="deck-selected-overlay">✓</div>`:``}
+                    </div>
+                    <div class="center-deck-info">
+                      <div class="center-deck-name">${e.name||`Deck ${e.slot}`}</div>
+                      <div class="center-deck-status ${t?`status-ready`:`status-empty`}">
+                        ${t?`${e.cards.length} cards`:`Empty`}
+                      </div>
+                    </div>
+                  </div>
+                `}).join(``)}
+            </div>
+
+            <div class="center-play-area">
+              <button class="btn-play ${a?``:`disabled`}" id="btn-play">
+                ${a?`⚔️ PLAY`:t.length===0?`Build a deck first`:`Select a deck`}
+              </button>
+              <button class="btn-go-builder" id="btn-go-builder">+ Build / Edit Decks</button>
+            </div>
+          `:`
+            <div class="coming-soon-center">
+              <div class="coming-soon-icon">🛡️</div>
+              <div class="coming-soon-text">Multiplayer coming soon</div>
+            </div>
+          `}
         </div>
 
-        <div class="menu-footer">RavenClash Alpha v0.1</div>
       </div>
     </div>
-  `,document.getElementById(`btn-vs-ai`)?.addEventListener(`click`,()=>{t&&n.go(`prematch`)}),document.getElementById(`btn-deck-builder`)?.addEventListener(`click`,()=>{n.go(`deckbuilder`)})}var ae={uncommon:`RavenCard_Green_Frame.png`,rare:`RavenCard_Blue_Frame.png`,epic:`RavenCard_Purple_Frame.png`,legendary:`RavenCard_Frame.png`};function oe(){let e=l();e.filter(e=>e.cards&&e.cards.length===20),document.querySelector(`#app`).innerHTML=`
+  `,le(e,a)}function le(e,t){document.getElementById(`topbar-name`)?.addEventListener(`change`,e=>{se(e.target.value)}),document.querySelectorAll(`.sidebar-mode`).forEach(e=>{e.addEventListener(`click`,()=>{let t=e.dataset.mode;x.find(e=>e.id===t)?.available&&(S=t,w())})}),document.querySelectorAll(`.center-deck.ready`).forEach(e=>{e.addEventListener(`click`,()=>{C=parseInt(e.dataset.slot),w()})}),document.getElementById(`btn-play`)?.addEventListener(`click`,()=>{t&&n.go(`game`,{slot:C})}),document.getElementById(`btn-collection`)?.addEventListener(`click`,()=>{n.go(`deckbuilder`)}),document.getElementById(`btn-go-builder`)?.addEventListener(`click`,()=>{n.go(`deckbuilder`)})}var ue={uncommon:`RavenCard_Green_Frame.png`,rare:`RavenCard_Blue_Frame.png`,epic:`RavenCard_Purple_Frame.png`,legendary:`RavenCard_Frame.png`};function de(){let e=l();e.filter(e=>e.cards&&e.cards.length===20),document.querySelector(`#app`).innerHTML=`
     <div class="prematch-screen">
       <div class="prematch-content">
         <h1 class="prematch-title">Choose Your Deck</h1>
         <p class="prematch-sub">Select a deck to battle with</p>
 
         <div class="prematch-decks">
-          ${e.map(e=>{let t=e.cards&&e.cards.length===20,n=e.coverId?r.find(t=>t.id===e.coverId):null,i=n?ae[n.rarity]:null;return`
+          ${e.map(e=>{let t=e.cards&&e.cards.length===20,n=e.coverId?r.find(t=>t.id===e.coverId):null,i=n?ue[n.rarity]:null;return`
               <div class="prematch-deck ${t?`ready`:`empty`}" data-slot="${e.slot}">
                 <div class="prematch-deck-art">
                   ${n?`
@@ -180,7 +219,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <button class="btn-back prematch-back" id="btn-back">← Back</button>
       </div>
     </div>
-  `,document.querySelectorAll(`.prematch-deck.ready`).forEach(e=>{e.addEventListener(`click`,()=>{let t=parseInt(e.dataset.slot);n.go(`game`,{slot:t})})}),document.getElementById(`btn-back`)?.addEventListener(`click`,()=>{n.go(`menu`)})}var S={card_play:new Audio(`/sounds/card_play.wav`),attack:new Audio(`/sounds/attack.wav`),death:new Audio(`/sounds/death.wav`),victory:new Audio(`/sounds/victory.wav`),defeat:new Audio(`/sounds/defeat.mp3`),card_draw:new Audio(`/sounds/card_draw.mp3`),turn:new Audio(`/sounds/turn.wav`)};Object.values(S).forEach(e=>{e.preload=`auto`,e.volume=.5}),S.victory.volume=.7,S.defeat.volume=.7,S.turn.volume=.3,S.card_draw.volume=.4;var C=!1;function w(e){if(C)return;let t=S[e];t&&(t.currentTime=0,t.play().catch(()=>{}))}function se(){return C=!C,C}function ce(){return C}var le=`modulepreload`,ue=function(e){return`/mi-tcg/`+e},T={},E=function(e,t,n){let r=Promise.resolve();if(t&&t.length>0){let e=document.getElementsByTagName(`link`),i=document.querySelector(`meta[property=csp-nonce]`),a=i?.nonce||i?.getAttribute(`nonce`);function o(e){return Promise.all(e.map(e=>Promise.resolve(e).then(e=>({status:`fulfilled`,value:e}),e=>({status:`rejected`,reason:e}))))}r=o(t.map(t=>{if(t=ue(t,n),t in T)return;T[t]=!0;let r=t.endsWith(`.css`),i=r?`[rel="stylesheet"]`:``;if(n)for(let n=e.length-1;n>=0;n--){let i=e[n];if(i.href===t&&(!r||i.rel===`stylesheet`))return}else if(document.querySelector(`link[href="${t}"]${i}`))return;let o=document.createElement(`link`);if(o.rel=r?`stylesheet`:le,r||(o.as=`script`),o.crossOrigin=``,o.href=t,a&&o.setAttribute(`nonce`,a),document.head.appendChild(o),r)return new Promise((e,n)=>{o.addEventListener(`load`,e),o.addEventListener(`error`,()=>n(Error(`Unable to preload CSS for ${t}`)))})}))}function i(e){let t=new Event(`vite:preloadError`,{cancelable:!0});if(t.payload=e,window.dispatchEvent(t),!t.defaultPrevented)throw e}return r.then(t=>{for(let e of t||[])e.status===`rejected`&&i(e.reason);return e().catch(i)})},D=t({attackWithCard:()=>I,checkWin:()=>V,endTurn:()=>R,freshGame:()=>he,gameState:()=>M,playCard:()=>F,triggerOpponentFirst:()=>ge}),de=1;function O(){return de++}function k(e){let t=[...e];for(let e=t.length-1;e>0;e--){let n=Math.floor(Math.random()*(e+1));[t[e],t[n]]=[t[n],t[e]]}return t}function A(e=1){let t=localStorage.getItem(`ravenclash_deck_${e}`),n=t?JSON.parse(t):null,i=n?.cards||(Array.isArray(n)?n:null);return k([...i&&i.length>0?i:[...r,...r].slice(0,20)]).map(e=>({...e,uid:O(),currentHp:e.hp,canAttack:!1,exhausted:!1,isOpponent:!1}))}function j(){return k([...r,...r,...r,...r]).slice(0,20).map(e=>({...e,uid:O(),currentHp:e.hp,canAttack:!1,exhausted:!1,isOpponent:!0}))}var M={turn:`player`,phase:`play`,turnNumber:1,selectedCard:null,gameOver:!1,winner:null,log:[`🎮 Game started! Your turn.`],_opponentGoesFirst:!1,_skipOpponentManaIncrement:!1,player:{hp:20,mana:0,maxMana:0,hand:[],board:[],deck:[]},opponent:{hp:20,mana:0,maxMana:0,hand:[],board:[],deck:[]}},N=A(),P=j();M.player.deck=N.slice(5),M.player.hand=N.slice(0,5),M.opponent.deck=P.slice(5),M.opponent.hand=P.slice(0,5),Math.random()<.5?(M.turn=`opponent`,M.log=[`🎲 Opponent goes first!`],M._opponentGoesFirst=!0,M._skipOpponentManaIncrement=!0,M.opponent.mana=1,M.opponent.maxMana=1):(M.log=[`🎲 You go first!`],M.player.mana=1,M.player.maxMana=1);function F(e){if(M.turn!==`player`||M.phase!==`play`)return;let t=M.player.hand.findIndex(t=>t.uid===e);if(t===-1)return;let n=M.player.hand[t];if(n.mana>M.player.mana){M.log.push(`❌ Not enough mana to play ${n.name}.`);return}M.player.mana-=n.mana,M.player.hand.splice(t,1),n.canAttack=!1,n.exhausted=!1,M.player.board.push(n),M.log.push(`▶️ You played ${n.name}.`),w(`card_play`),setTimeout(()=>X(n.uid),50)}async function I(e){if(M.turn!==`player`||M.phase!==`attack`)return;let t=M.player.board.find(t=>t.uid===e);if(t&&!t.isOpponent){if(!t.canAttack){M.log.push(`😴 ${t.name} has summoning sickness — wait a turn.`),M.selectedCard=null;return}if(t.exhausted){M.log.push(`😓 ${t.name} already attacked this turn.`),M.selectedCard=null;return}M.selectedCard=t,M.log.push(`🎯 ${t.name} ready — click an enemy creature or the opponent's hero.`);return}if(M.selectedCard){let t=M.selectedCard,n=M.opponent.board.find(t=>t.uid===e);n&&(await L(t,n),M.selectedCard=null)}}async function L(e,t){let n=!e.isOpponent;await Z(e.uid,n?`up`:`down`),w(`attack`),J(t.uid),J(e.uid);let r=document.querySelector(`[data-uid="${t.uid}"]`),i=document.querySelector(`[data-uid="${e.uid}"]`);r&&q(e.attack,r),i&&q(t.attack,i),e.currentHp-=t.attack,t.currentHp-=e.attack,e.exhausted=!0,M.log.push(`⚔️ ${e.name} (${e.attack} atk) vs ${t.name} (${t.attack} atk)`);let a=[];e.currentHp<=0&&(a.push(e.uid),M.log.push(`💀 ${e.name} died.`)),t.currentHp<=0&&(a.push(t.uid),M.log.push(`💀 ${t.name} died.`)),a.length>0&&(w(`death`),await Promise.all(a.map(e=>Y(e)))),M.player.board=M.player.board.filter(e=>e.currentHp>0),M.opponent.board=M.opponent.board.filter(e=>e.currentHp>0)}function R(){M.phase=`play`,M.selectedCard=null,M.turn=`opponent`,M.log.push(`⏭️ You ended your turn.`),setTimeout(()=>{B()},800)}function z(e){return e.attack+e.currentHp}function fe(e,t){let n=t.filter(t=>e.attack>=t.currentHp&&t.attack<e.currentHp);if(n.length>0)return n.reduce((e,t)=>z(t)>z(e)?t:e);let r=t.filter(t=>e.attack>=t.currentHp&&z(t)>=z(e));return r.length>0?r.reduce((e,t)=>z(t)>z(e)?t:e):t.reduce((e,t)=>z(t)>z(e)?t:e)}function pe(e){return e.reduce((e,t)=>e+t.attack,0)>=M.player.hp}function me(e,t){let n=[...e].sort((e,t)=>z(t)-z(e)),r=[],i=t;for(let e of n)e.mana<=i&&(r.push(e),i-=e.mana);return r}async function B(){let e=M.opponent;M._skipOpponentManaIncrement?M._skipOpponentManaIncrement=!1:(e.maxMana=Math.min(10,e.maxMana+1),e.mana=e.maxMana),e.board.forEach(e=>{e.canAttack=!0,e.exhausted=!1});let t=e.board.map(e=>e.uid),n=me(e.hand,e.mana);for(let t of n){let n=e.hand.findIndex(e=>e.uid===t.uid);n!==-1&&(t.mana>e.mana||(e.hand.splice(n,1),e.mana-=t.mana,t.canAttack=!1,t.exhausted=!1,M.log.push(`🤖 Opponent played ${t.name}.`),w(`card_play`),await $(t,!0),e.board.push(t),E(()=>Promise.resolve().then(()=>H).then(e=>e.renderBoard()),void 0),await new Promise(e=>setTimeout(e,300))))}let r=M.player.board,i=t.map(t=>e.board.find(e=>e.uid===t)).filter(e=>e&&e.currentHp>0&&!e.exhausted);if(r.length===0&&pe(i)){for(let e of i)if(!(e.currentHp<=0||e.exhausted)&&(M.player.hp-=e.attack,e.exhausted=!0,Q(`player`),w(`attack`),M.log.push(`🤖 ${e.name} attacked your hero for ${e.attack}! (LETHAL)`),V(),M.gameOver))break}else{for(let n of t){let t=e.board.find(e=>e.uid===n);if(!t||t.currentHp<=0||t.exhausted)continue;let r=M.player.board;if(r.length>0?await L(t,fe(t,r)):(M.player.hp-=t.attack,t.exhausted=!0,Q(`player`),w(`attack`),M.log.push(`🤖 ${t.name} attacked your hero for ${t.attack}!`),V()),M.gameOver)break}for(let n of t){let t=e.board.find(e=>e.uid===n);if(!(!t||t.currentHp<=0||t.exhausted)&&M.player.board.length===0&&(M.player.hp-=t.attack,t.exhausted=!0,Q(`player`),w(`attack`),M.log.push(`🤖 ${t.name} attacked your hero for ${t.attack}!`),V(),M.gameOver))break}}e.deck.length>0&&e.hand.push(e.deck.shift()),M.turn=`player`,M.phase=`play`,M.turnNumber++,M.player.maxMana=Math.min(10,M.player.maxMana+1),M.player.mana=M.player.maxMana,M.player.board.forEach(e=>{e.canAttack=!0,e.exhausted=!1}),M.player.deck.length>0&&M.player.hand.push(M.player.deck.shift()),w(`turn`),w(`card_draw`),M.log.push(`🎮 Your turn! Mana: ${M.player.mana}`),E(()=>Promise.resolve().then(()=>H).then(e=>e.renderBoard()),void 0)}function V(){M.opponent.hp<=0&&(M.gameOver=!0,M.winner=`player`,M.log.push(`🏆 You win!`),w(`victory`)),M.player.hp<=0&&(M.gameOver=!0,M.winner=`opponent`,M.log.push(`💀 You lost!`),w(`defeat`))}function he(e=1){let t=A(e),n=j(),r={turn:`player`,phase:`play`,turnNumber:1,selectedCard:null,gameOver:!1,winner:null,log:[],_opponentGoesFirst:!1,_skipOpponentManaIncrement:!1,player:{hp:20,mana:0,maxMana:0,hand:t.slice(0,5),deck:t.slice(5),board:[]},opponent:{hp:20,mana:0,maxMana:0,hand:n.slice(0,5),deck:n.slice(5),board:[]}};return Math.random()<.5?(r.turn=`opponent`,r.log=[`🎲 Opponent goes first!`],r._opponentGoesFirst=!0,r._skipOpponentManaIncrement=!0,r.opponent.mana=1,r.opponent.maxMana=1):(r.log=[`🎲 You go first!`],r.player.mana=1,r.player.maxMana=1),r}function ge(){M._opponentGoesFirst&&B()}var H=t({animateCardDeath:()=>Y,animateCardHit:()=>J,animateCardLunge:()=>Z,animateCardPlayed:()=>X,animateCardPlayedFromHand:()=>$,animateHeroHit:()=>Q,floatDamage:()=>q,renderBoard:()=>G,renderCard:()=>W}),U={uncommon:`RavenCard_Green_Frame.png`,rare:`RavenCard_Blue_Frame.png`,epic:`RavenCard_Purple_Frame.png`,legendary:`RavenCard_Frame.png`};function W(e,t=`hand`){let n=e.rarity===`legendary`,r=t===`hand`&&e.mana<=M.player.mana&&M.phase===`play`,i=t===`board`&&e.canAttack&&M.phase===`attack`&&!e.isOpponent,a=M.selectedCard&&M.selectedCard.uid===e.uid;return`
+  `,document.querySelectorAll(`.prematch-deck.ready`).forEach(e=>{e.addEventListener(`click`,()=>{let t=parseInt(e.dataset.slot);n.go(`game`,{slot:t})})}),document.getElementById(`btn-back`)?.addEventListener(`click`,()=>{n.go(`menu`)})}var T={card_play:new Audio(`/sounds/card_play.wav`),attack:new Audio(`/sounds/attack.wav`),death:new Audio(`/sounds/death.wav`),victory:new Audio(`/sounds/victory.wav`),defeat:new Audio(`/sounds/defeat.mp3`),card_draw:new Audio(`/sounds/card_draw.mp3`),turn:new Audio(`/sounds/turn.wav`)};Object.values(T).forEach(e=>{e.preload=`auto`,e.volume=.5}),T.victory.volume=.7,T.defeat.volume=.7,T.turn.volume=.3,T.card_draw.volume=.4;var E=!1;function D(e){if(E)return;let t=T[e];t&&(t.currentTime=0,t.play().catch(()=>{}))}function fe(){return E=!E,E}function pe(){return E}var me=`modulepreload`,he=function(e){return`/mi-tcg/`+e},O={},k=function(e,t,n){let r=Promise.resolve();if(t&&t.length>0){let e=document.getElementsByTagName(`link`),i=document.querySelector(`meta[property=csp-nonce]`),a=i?.nonce||i?.getAttribute(`nonce`);function o(e){return Promise.all(e.map(e=>Promise.resolve(e).then(e=>({status:`fulfilled`,value:e}),e=>({status:`rejected`,reason:e}))))}r=o(t.map(t=>{if(t=he(t,n),t in O)return;O[t]=!0;let r=t.endsWith(`.css`),i=r?`[rel="stylesheet"]`:``;if(n)for(let n=e.length-1;n>=0;n--){let i=e[n];if(i.href===t&&(!r||i.rel===`stylesheet`))return}else if(document.querySelector(`link[href="${t}"]${i}`))return;let o=document.createElement(`link`);if(o.rel=r?`stylesheet`:me,r||(o.as=`script`),o.crossOrigin=``,o.href=t,a&&o.setAttribute(`nonce`,a),document.head.appendChild(o),r)return new Promise((e,n)=>{o.addEventListener(`load`,e),o.addEventListener(`error`,()=>n(Error(`Unable to preload CSS for ${t}`)))})}))}function i(e){let t=new Event(`vite:preloadError`,{cancelable:!0});if(t.payload=e,window.dispatchEvent(t),!t.defaultPrevented)throw e}return r.then(t=>{for(let e of t||[])e.status===`rejected`&&i(e.reason);return e().catch(i)})},A=t({attackWithCard:()=>z,checkWin:()=>W,endTurn:()=>V,freshGame:()=>be,gameState:()=>F,playCard:()=>R,triggerOpponentFirst:()=>xe}),ge=1;function j(){return ge++}function M(e){let t=[...e];for(let e=t.length-1;e>0;e--){let n=Math.floor(Math.random()*(e+1));[t[e],t[n]]=[t[n],t[e]]}return t}function N(e=1){let t=localStorage.getItem(`ravenclash_deck_${e}`),n=t?JSON.parse(t):null,i=n?.cards||(Array.isArray(n)?n:null);return M([...i&&i.length>0?i:[...r,...r].slice(0,20)]).map(e=>({...e,uid:j(),currentHp:e.hp,canAttack:!1,exhausted:!1,isOpponent:!1}))}function P(){return M([...r,...r,...r,...r]).slice(0,20).map(e=>({...e,uid:j(),currentHp:e.hp,canAttack:!1,exhausted:!1,isOpponent:!0}))}var F={turn:`player`,phase:`play`,turnNumber:1,selectedCard:null,gameOver:!1,winner:null,log:[`🎮 Game started! Your turn.`],_opponentGoesFirst:!1,_skipOpponentManaIncrement:!1,player:{hp:20,mana:0,maxMana:0,hand:[],board:[],deck:[]},opponent:{hp:20,mana:0,maxMana:0,hand:[],board:[],deck:[]}},I=N(),L=P();F.player.deck=I.slice(5),F.player.hand=I.slice(0,5),F.opponent.deck=L.slice(5),F.opponent.hand=L.slice(0,5),Math.random()<.5?(F.turn=`opponent`,F.log=[`🎲 Opponent goes first!`],F._opponentGoesFirst=!0,F._skipOpponentManaIncrement=!0,F.opponent.mana=1,F.opponent.maxMana=1):(F.log=[`🎲 You go first!`],F.player.mana=1,F.player.maxMana=1);function R(e){if(F.turn!==`player`||F.phase!==`play`)return;let t=F.player.hand.findIndex(t=>t.uid===e);if(t===-1)return;let n=F.player.hand[t];if(n.mana>F.player.mana){F.log.push(`❌ Not enough mana to play ${n.name}.`);return}F.player.mana-=n.mana,F.player.hand.splice(t,1),n.canAttack=!1,n.exhausted=!1,F.player.board.push(n),F.log.push(`▶️ You played ${n.name}.`),D(`card_play`),setTimeout(()=>we(n.uid),50)}async function z(e){if(F.turn!==`player`||F.phase!==`attack`)return;let t=F.player.board.find(t=>t.uid===e);if(t&&!t.isOpponent){if(!t.canAttack){F.log.push(`😴 ${t.name} has summoning sickness — wait a turn.`),F.selectedCard=null;return}if(t.exhausted){F.log.push(`😓 ${t.name} already attacked this turn.`),F.selectedCard=null;return}F.selectedCard=t,F.log.push(`🎯 ${t.name} ready — click an enemy creature or the opponent's hero.`);return}if(F.selectedCard){let t=F.selectedCard,n=F.opponent.board.find(t=>t.uid===e);n&&(await B(t,n),F.selectedCard=null)}}async function B(e,t){let n=!e.isOpponent;await Te(e.uid,n?`up`:`down`),D(`attack`),Z(t.uid),Z(e.uid);let r=document.querySelector(`[data-uid="${t.uid}"]`),i=document.querySelector(`[data-uid="${e.uid}"]`);r&&X(e.attack,r),i&&X(t.attack,i),e.currentHp-=t.attack,t.currentHp-=e.attack,e.exhausted=!0,F.log.push(`⚔️ ${e.name} (${e.attack} atk) vs ${t.name} (${t.attack} atk)`);let a=[];e.currentHp<=0&&(a.push(e.uid),F.log.push(`💀 ${e.name} died.`)),t.currentHp<=0&&(a.push(t.uid),F.log.push(`💀 ${t.name} died.`)),a.length>0&&(D(`death`),await Promise.all(a.map(e=>Ce(e)))),F.player.board=F.player.board.filter(e=>e.currentHp>0),F.opponent.board=F.opponent.board.filter(e=>e.currentHp>0)}function V(){F.phase=`play`,F.selectedCard=null,F.turn=`opponent`,F.log.push(`⏭️ You ended your turn.`),setTimeout(()=>{U()},800)}function H(e){return e.attack+e.currentHp}function _e(e,t){let n=t.filter(t=>e.attack>=t.currentHp&&t.attack<e.currentHp);if(n.length>0)return n.reduce((e,t)=>H(t)>H(e)?t:e);let r=t.filter(t=>e.attack>=t.currentHp&&H(t)>=H(e));return r.length>0?r.reduce((e,t)=>H(t)>H(e)?t:e):t.reduce((e,t)=>H(t)>H(e)?t:e)}function ve(e){return e.reduce((e,t)=>e+t.attack,0)>=F.player.hp}function ye(e,t){let n=[...e].sort((e,t)=>H(t)-H(e)),r=[],i=t;for(let e of n)e.mana<=i&&(r.push(e),i-=e.mana);return r}async function U(){let e=F.opponent;F._skipOpponentManaIncrement?F._skipOpponentManaIncrement=!1:(e.maxMana=Math.min(10,e.maxMana+1),e.mana=e.maxMana),e.board.forEach(e=>{e.canAttack=!0,e.exhausted=!1});let t=e.board.map(e=>e.uid),n=ye(e.hand,e.mana);for(let t of n){let n=e.hand.findIndex(e=>e.uid===t.uid);n!==-1&&(t.mana>e.mana||(e.hand.splice(n,1),e.mana-=t.mana,t.canAttack=!1,t.exhausted=!1,F.log.push(`🤖 Opponent played ${t.name}.`),D(`card_play`),await $(t,!0),e.board.push(t),k(()=>Promise.resolve().then(()=>G).then(e=>e.renderBoard()),void 0),await new Promise(e=>setTimeout(e,300))))}let r=F.player.board,i=t.map(t=>e.board.find(e=>e.uid===t)).filter(e=>e&&e.currentHp>0&&!e.exhausted);if(r.length===0&&ve(i)){for(let e of i)if(!(e.currentHp<=0||e.exhausted)&&(F.player.hp-=e.attack,e.exhausted=!0,Q(`player`),D(`attack`),F.log.push(`🤖 ${e.name} attacked your hero for ${e.attack}! (LETHAL)`),W(),F.gameOver))break}else{for(let n of t){let t=e.board.find(e=>e.uid===n);if(!t||t.currentHp<=0||t.exhausted)continue;let r=F.player.board;if(r.length>0?await B(t,_e(t,r)):(F.player.hp-=t.attack,t.exhausted=!0,Q(`player`),D(`attack`),F.log.push(`🤖 ${t.name} attacked your hero for ${t.attack}!`),W()),F.gameOver)break}for(let n of t){let t=e.board.find(e=>e.uid===n);if(!(!t||t.currentHp<=0||t.exhausted)&&F.player.board.length===0&&(F.player.hp-=t.attack,t.exhausted=!0,Q(`player`),D(`attack`),F.log.push(`🤖 ${t.name} attacked your hero for ${t.attack}!`),W(),F.gameOver))break}}e.deck.length>0&&e.hand.push(e.deck.shift()),F.turn=`player`,F.phase=`play`,F.turnNumber++,F.player.maxMana=Math.min(10,F.player.maxMana+1),F.player.mana=F.player.maxMana,F.player.board.forEach(e=>{e.canAttack=!0,e.exhausted=!1}),F.player.deck.length>0&&F.player.hand.push(F.player.deck.shift()),D(`turn`),D(`card_draw`),F.log.push(`🎮 Your turn! Mana: ${F.player.mana}`),k(()=>Promise.resolve().then(()=>G).then(e=>e.renderBoard()),void 0)}function W(){F.opponent.hp<=0&&(F.gameOver=!0,F.winner=`player`,F.log.push(`🏆 You win!`),D(`victory`)),F.player.hp<=0&&(F.gameOver=!0,F.winner=`opponent`,F.log.push(`💀 You lost!`),D(`defeat`))}function be(e=1){let t=N(e),n=P(),r={turn:`player`,phase:`play`,turnNumber:1,selectedCard:null,gameOver:!1,winner:null,log:[],_opponentGoesFirst:!1,_skipOpponentManaIncrement:!1,player:{hp:20,mana:0,maxMana:0,hand:t.slice(0,5),deck:t.slice(5),board:[]},opponent:{hp:20,mana:0,maxMana:0,hand:n.slice(0,5),deck:n.slice(5),board:[]}};return Math.random()<.5?(r.turn=`opponent`,r.log=[`🎲 Opponent goes first!`],r._opponentGoesFirst=!0,r._skipOpponentManaIncrement=!0,r.opponent.mana=1,r.opponent.maxMana=1):(r.log=[`🎲 You go first!`],r.player.mana=1,r.player.maxMana=1),r}function xe(){F._opponentGoesFirst&&U()}var G=t({animateCardDeath:()=>Ce,animateCardHit:()=>Z,animateCardLunge:()=>Te,animateCardPlayed:()=>we,animateCardPlayedFromHand:()=>$,animateHeroHit:()=>Q,floatDamage:()=>X,renderBoard:()=>J,renderCard:()=>q}),K={uncommon:`RavenCard_Green_Frame.png`,rare:`RavenCard_Blue_Frame.png`,epic:`RavenCard_Purple_Frame.png`,legendary:`RavenCard_Frame.png`};function q(e,t=`hand`){let n=e.rarity===`legendary`,r=t===`hand`&&e.mana<=F.player.mana&&F.phase===`play`,i=t===`board`&&e.canAttack&&F.phase===`attack`&&!e.isOpponent,a=F.selectedCard&&F.selectedCard.uid===e.uid;return`
     <div class="card rarity-${e.rarity}
       ${r?`playable`:``}
       ${i?`can-attack`:``}
@@ -198,7 +237,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="art-vignette"></div>
       </div>
       <div class="card-frame">
-        <img src="/${U[e.rarity]}" alt="frame" />
+        <img src="/${K[e.rarity]}" alt="frame" />
       </div>
       <div class="card-mana">${e.mana}</div>
       <div class="card-name">${e.name}</div>
@@ -213,14 +252,14 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         </div>
       </div>
     </div>
-  `}function G(){let e=M;document.querySelector(`#app`).innerHTML=`
+  `}function J(){let e=F;document.querySelector(`#app`).innerHTML=`
     <div class="board">
       <div class="player-area opponent-area">
         <div class="hand-area opponent-hand">
           ${e.opponent.hand.map(()=>`<div class="card-back"></div>`).join(``)}
         </div>
         <div class="battlefield opponent-field" id="opponent-field">
-          ${e.opponent.board.map(e=>W(e,`board`)).join(``)}
+          ${e.opponent.board.map(e=>q(e,`board`)).join(``)}
           ${e.opponent.board.length===0?`<div class="empty-field-hint">Opponent's field</div>`:``}
         </div>
         <div class="hero-info">
@@ -242,7 +281,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         </div>
         <div class="action-buttons">
           <button class="btn-back-menu" id="btn-back-menu">🏠 Menu</button>
-          <button class="btn-mute" id="btn-mute">${ce()?`🔇`:`🔊`}</button>
+          <button class="btn-mute" id="btn-mute">${pe()?`🔇`:`🔊`}</button>
           ${e.turn===`player`?`
             ${e.phase===`play`?`<button class="btn-phase" id="btn-attack-phase">Attack Phase →</button>`:``}
             ${e.phase===`attack`?`<button class="btn-end-turn" id="btn-end-turn">End Turn ⏭</button>`:``}
@@ -252,10 +291,10 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
 
       <div class="player-area player-area-bottom">
         <div class="hand-area player-hand" id="player-hand">
-          ${e.player.hand.map(e=>W(e,`hand`)).join(``)}
+          ${e.player.hand.map(e=>q(e,`hand`)).join(``)}
         </div>
         <div class="battlefield player-field" id="player-field">
-          ${e.player.board.map(e=>W(e,`board`)).join(``)}
+          ${e.player.board.map(e=>q(e,`board`)).join(``)}
           ${e.player.board.length===0?`<div class="empty-field-hint">Your field — play cards here</div>`:``}
         </div>
         <div class="hero-info">
@@ -285,12 +324,12 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         </div>
       </div>
     `:``}
-  `,ve()}function _e(e,t){K();let n={uncommon:`Uncommon`,rare:`Rare`,epic:`Epic`,legendary:`Legendary`},r={uncommon:`#6ee7b7`,rare:`#93c5fd`,epic:`#c4b5fd`,legendary:`#fcd34d`},i=document.createElement(`div`);i.className=`card-tooltip rarity-border-${e.rarity}`,i.id=`card-tooltip`,i.innerHTML=`
+  `,Ee()}function Se(e,t){Y();let n={uncommon:`Uncommon`,rare:`Rare`,epic:`Epic`,legendary:`Legendary`},r={uncommon:`#6ee7b7`,rare:`#93c5fd`,epic:`#c4b5fd`,legendary:`#fcd34d`},i=document.createElement(`div`);i.className=`card-tooltip rarity-border-${e.rarity}`,i.id=`card-tooltip`,i.innerHTML=`
     <div class="tooltip-art">
       <img src="/cards/${e.image}" alt="${e.name}" />
       <div class="tooltip-art-vignette"></div>
       <div class="tooltip-frame">
-        <img src="/${U[e.rarity]}" alt="" />
+        <img src="/${K[e.rarity]}" alt="" />
       </div>
       <div class="tooltip-mana">${e.mana}</div>
     </div>
@@ -323,7 +362,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="tooltip-lore-text">${e.lore||`Ancient and mysterious, this creature's origins are lost to time...`}</div>
       </div>
     </div>
-  `,document.body.appendChild(i);let a=t.getBoundingClientRect(),o=a.right+12,s=a.top-40;o+260>window.innerWidth&&(o=a.left-260-12),s+420>window.innerHeight&&(s=window.innerHeight-420-60),s<8&&(s=8),i.style.left=`${o}px`,i.style.top=`${s}px`}function K(){document.getElementById(`card-tooltip`)?.remove()}function q(e,t,n=!1){let r=t.getBoundingClientRect(),i=document.createElement(`div`);i.className=`damage-number ${n?`heal-dmg`:`attack-dmg`}`,i.textContent=n?`+${e}`:`-${e}`,i.style.left=`${r.left+r.width/2-20}px`,i.style.top=`${r.top+r.height/2-20}px`,document.body.appendChild(i),setTimeout(()=>i.remove(),1200)}function J(e){let t=document.querySelector(`[data-uid="${e}"]`);t&&(t.classList.remove(`card-shake`,`card-hit`),t.offsetWidth,t.classList.add(`card-shake`,`card-hit`),q(`💥`,t),setTimeout(()=>t.classList.remove(`card-shake`,`card-hit`),400))}function Y(e){return new Promise(t=>{let n=document.querySelector(`[data-uid="${e}"]`);if(!n)return t();n.classList.add(`card-dying`),setTimeout(t,600)})}function X(e){let t=document.querySelector(`[data-uid="${e}"]`);t&&(t.classList.add(`card-played`),setTimeout(()=>t.classList.remove(`card-played`),500))}function Z(e,t=`up`){return new Promise(n=>{let r=document.querySelector(`[data-uid="${e}"]`);if(!r)return n();r.classList.add(`card-lunge-${t}`),setTimeout(()=>{r.classList.remove(`card-lunge-${t}`),n()},400)})}function Q(e){let t=document.querySelector(`.${e}-portrait`);t&&(t.classList.add(`hero-shake`,`hero-hit`),t.getBoundingClientRect(),q(`💥`,t),setTimeout(()=>t.classList.remove(`hero-shake`,`hero-hit`),500))}function $(e,t=!1){return new Promise(n=>{let r=U[e.rarity],i=document.createElement(`div`);i.className=`card rarity-${e.rarity}`,i.style.cssText=`
+  `,document.body.appendChild(i);let a=t.getBoundingClientRect(),o=a.right+12,s=a.top-40;o+260>window.innerWidth&&(o=a.left-260-12),s+420>window.innerHeight&&(s=window.innerHeight-420-60),s<8&&(s=8),i.style.left=`${o}px`,i.style.top=`${s}px`}function Y(){document.getElementById(`card-tooltip`)?.remove()}function X(e,t,n=!1){let r=t.getBoundingClientRect(),i=document.createElement(`div`);i.className=`damage-number ${n?`heal-dmg`:`attack-dmg`}`,i.textContent=n?`+${e}`:`-${e}`,i.style.left=`${r.left+r.width/2-20}px`,i.style.top=`${r.top+r.height/2-20}px`,document.body.appendChild(i),setTimeout(()=>i.remove(),1200)}function Z(e){let t=document.querySelector(`[data-uid="${e}"]`);t&&(t.classList.remove(`card-shake`,`card-hit`),t.offsetWidth,t.classList.add(`card-shake`,`card-hit`),X(`💥`,t),setTimeout(()=>t.classList.remove(`card-shake`,`card-hit`),400))}function Ce(e){return new Promise(t=>{let n=document.querySelector(`[data-uid="${e}"]`);if(!n)return t();n.classList.add(`card-dying`),setTimeout(t,600)})}function we(e){let t=document.querySelector(`[data-uid="${e}"]`);t&&(t.classList.add(`card-played`),setTimeout(()=>t.classList.remove(`card-played`),500))}function Te(e,t=`up`){return new Promise(n=>{let r=document.querySelector(`[data-uid="${e}"]`);if(!r)return n();r.classList.add(`card-lunge-${t}`),setTimeout(()=>{r.classList.remove(`card-lunge-${t}`),n()},400)})}function Q(e){let t=document.querySelector(`.${e}-portrait`);t&&(t.classList.add(`hero-shake`,`hero-hit`),t.getBoundingClientRect(),X(`💥`,t),setTimeout(()=>t.classList.remove(`hero-shake`,`hero-hit`),500))}function $(e,t=!1){return new Promise(n=>{let r=K[e.rarity],i=document.createElement(`div`);i.className=`card rarity-${e.rarity}`,i.style.cssText=`
       position: fixed;
       width: ${t?`60px`:`80px`};
       height: ${t?`84px`:`112px`};
@@ -339,4 +378,4 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
       <div class="card-frame" style="position:absolute;inset:0;z-index:5;pointer-events:none;">
         <img src="/${r}" style="width:100%;height:100%;object-fit:fill;" />
       </div>
-    `;let a=document.querySelector(t?`.opponent-hand`:`.player-hand`),o=document.querySelector(t?`.opponent-field`:`.player-field`);if(!a||!o)return n();let s=a.getBoundingClientRect(),c=o.getBoundingClientRect();i.style.left=`${s.left+s.width/2-(t?30:40)}px`,i.style.top=`${s.top}px`,document.body.appendChild(i);let l=c.top-s.top;i.style.transition=`transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease`,requestAnimationFrame(()=>{requestAnimationFrame(()=>{i.style.transform=`translateY(${l}px) scale(1.15)`,i.style.opacity=`0.9`,setTimeout(()=>{i.style.opacity=`0`,setTimeout(()=>{i.remove(),n()},400)},350)})})})}function ve(){document.querySelectorAll(`.card`).forEach(e=>{e.addEventListener(`mouseenter`,()=>{let t=parseInt(e.dataset.uid),n=M.player.hand.find(e=>e.uid===t)||M.player.board.find(e=>e.uid===t)||M.opponent.board.find(e=>e.uid===t);n&&_e(n,e)}),e.addEventListener(`mouseleave`,K)}),document.querySelectorAll(`.card[data-context="hand"]`).forEach(e=>{e.addEventListener(`click`,()=>{F(parseInt(e.dataset.uid)),G()})}),document.querySelectorAll(`.card[data-context="board"]`).forEach(e=>{e.addEventListener(`click`,async()=>{await I(parseInt(e.dataset.uid)),G()})}),document.getElementById(`opponent-hero`)?.addEventListener(`click`,()=>{if(M.selectedCard&&M.phase===`attack`&&M.turn===`player`){let e=M.selectedCard;M.opponent.hp-=e.attack,e.exhausted=!0,Q(`opponent`),w(`attack`),M.log.push(`⚔️ ${e.name} struck the opponent hero for ${e.attack} damage!`),M.selectedCard=null,V(),G()}}),document.getElementById(`btn-mute`)?.addEventListener(`click`,()=>{se(),G()}),document.getElementById(`btn-attack-phase`)?.addEventListener(`click`,()=>{M.phase=`attack`,M.log.push(`⚔️ Attack phase started.`),G()}),document.getElementById(`btn-end-turn`)?.addEventListener(`click`,()=>{R(),G()}),document.getElementById(`btn-back-menu`)?.addEventListener(`click`,()=>{K(),n.go(`menu`)}),document.getElementById(`btn-restart`)?.addEventListener(`click`,()=>{n.go(`game`)}),document.getElementById(`btn-menu`)?.addEventListener(`click`,()=>{K(),n.go(`menu`)})}n.onChange((e,t)=>{K(),e===`menu`&&x(),e===`deckbuilder`&&b(),e===`prematch`&&oe(),e===`game`&&E(()=>Promise.resolve().then(()=>D).then(e=>{let n=e.freshGame(t?.slot);Object.assign(M,n),G(),n._opponentGoesFirst&&setTimeout(()=>{E(()=>Promise.resolve().then(()=>D).then(e=>e.triggerOpponentFirst()),void 0)},1200)}),void 0)}),x();export{D as n,H as t};
+    `;let a=document.querySelector(t?`.opponent-hand`:`.player-hand`),o=document.querySelector(t?`.opponent-field`:`.player-field`);if(!a||!o)return n();let s=a.getBoundingClientRect(),c=o.getBoundingClientRect();i.style.left=`${s.left+s.width/2-(t?30:40)}px`,i.style.top=`${s.top}px`,document.body.appendChild(i);let l=c.top-s.top;i.style.transition=`transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease`,requestAnimationFrame(()=>{requestAnimationFrame(()=>{i.style.transform=`translateY(${l}px) scale(1.15)`,i.style.opacity=`0.9`,setTimeout(()=>{i.style.opacity=`0`,setTimeout(()=>{i.remove(),n()},400)},350)})})})}function Ee(){document.querySelectorAll(`.card`).forEach(e=>{e.addEventListener(`mouseenter`,()=>{let t=parseInt(e.dataset.uid),n=F.player.hand.find(e=>e.uid===t)||F.player.board.find(e=>e.uid===t)||F.opponent.board.find(e=>e.uid===t);n&&Se(n,e)}),e.addEventListener(`mouseleave`,Y)}),document.querySelectorAll(`.card[data-context="hand"]`).forEach(e=>{e.addEventListener(`click`,()=>{R(parseInt(e.dataset.uid)),J()})}),document.querySelectorAll(`.card[data-context="board"]`).forEach(e=>{e.addEventListener(`click`,async()=>{await z(parseInt(e.dataset.uid)),J()})}),document.getElementById(`opponent-hero`)?.addEventListener(`click`,()=>{if(F.selectedCard&&F.phase===`attack`&&F.turn===`player`){let e=F.selectedCard;F.opponent.hp-=e.attack,e.exhausted=!0,Q(`opponent`),D(`attack`),F.log.push(`⚔️ ${e.name} struck the opponent hero for ${e.attack} damage!`),F.selectedCard=null,W(),J()}}),document.getElementById(`btn-mute`)?.addEventListener(`click`,()=>{fe(),J()}),document.getElementById(`btn-attack-phase`)?.addEventListener(`click`,()=>{F.phase=`attack`,F.log.push(`⚔️ Attack phase started.`),J()}),document.getElementById(`btn-end-turn`)?.addEventListener(`click`,()=>{V(),J()}),document.getElementById(`btn-back-menu`)?.addEventListener(`click`,()=>{Y(),n.go(`menu`)}),document.getElementById(`btn-restart`)?.addEventListener(`click`,()=>{n.go(`game`)}),document.getElementById(`btn-menu`)?.addEventListener(`click`,()=>{Y(),n.go(`menu`)})}n.onChange((e,t)=>{Y(),e===`menu`&&w(),e===`deckbuilder`&&b(),e===`prematch`&&de(),e===`game`&&k(()=>Promise.resolve().then(()=>A).then(e=>{let n=e.freshGame(t?.slot);Object.assign(F,n),J(),n._opponentGoesFirst&&setTimeout(()=>{k(()=>Promise.resolve().then(()=>A).then(e=>e.triggerOpponentFirst()),void 0)},1200)}),void 0)}),w();export{A as n,G as t};
