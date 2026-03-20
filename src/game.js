@@ -245,3 +245,34 @@ export function checkWin() {
 if (gameState._opponentGoesFirst) {
   setTimeout(() => { opponentTurn() }, 1200)
 }
+
+export function freshGame() {
+  const pd = buildDeck()
+  const od = buildOpponentDeck()
+  const fresh = {
+    turn: 'player',
+    phase: 'play',
+    turnNumber: 1,
+    selectedCard: null,
+    gameOver: false,
+    winner: null,
+    log: [],
+    _opponentGoesFirst: false,
+    _skipOpponentManaIncrement: false,
+    player: { hp: 20, mana: 0, maxMana: 0, hand: pd.slice(0, 5), deck: pd.slice(5), board: [] },
+    opponent: { hp: 20, mana: 0, maxMana: 0, hand: od.slice(0, 5), deck: od.slice(5), board: [] },
+  }
+  if (Math.random() < 0.5) {
+    fresh.turn = 'opponent'
+    fresh.log = ['🎲 Opponent goes first!']
+    fresh._opponentGoesFirst = true
+    fresh._skipOpponentManaIncrement = true
+    fresh.opponent.mana = 1
+    fresh.opponent.maxMana = 1
+  } else {
+    fresh.log = ['🎲 You go first!']
+    fresh.player.mana = 1
+    fresh.player.maxMana = 1
+  }
+  return fresh
+}

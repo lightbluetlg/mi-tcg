@@ -1,4 +1,7 @@
 import './style.css'
+import { router } from './router.js'
+import { renderMenu } from './pages/menu.js'
+import { renderDeckBuilder, getSavedDeck } from './pages/deckbuilder.js'
 import { gameState, playCard, attackWithCard, endTurn, checkWin } from './game.js'
 import { allCards } from './cards.js'
 
@@ -9,7 +12,6 @@ const rarityFrames = {
   legendary: 'RavenCard_Frame.png',
 }
 
-// ── RENDER A CARD
 export function renderCard(card, context = 'hand') {
   const isLegendary = card.rarity === 'legendary'
   const canPlay = context === 'hand' && card.mana <= gameState.player.mana && gameState.phase === 'play'
@@ -52,13 +54,10 @@ export function renderCard(card, context = 'hand') {
   `
 }
 
-// ── RENDER THE FULL BOARD
 export function renderBoard() {
   const gs = gameState
   document.querySelector('#app').innerHTML = `
     <div class="board">
-
-      <!-- OPPONENT SIDE -->
       <div class="player-area opponent-area">
         <div class="hand-area opponent-hand">
           ${gs.opponent.hand.map(() => `<div class="card-back"></div>`).join('')}
@@ -69,9 +68,9 @@ export function renderBoard() {
         </div>
         <div class="hero-info">
           <div class="hero-portrait opponent-portrait ${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? 'attackable-hero' : ''}" id="opponent-hero">
-  <div class="hero-name">${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? '⚔️ Attack!' : 'Opponent'}</div>
-  <div class="hero-hp">❤️ ${gs.opponent.hp}</div>
-</div>
+            <div class="hero-name">${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? '⚔️ Attack!' : 'Opponent'}</div>
+            <div class="hero-hp">❤️ ${gs.opponent.hp}</div>
+          </div>
           <div class="mana-display">
             <span class="mana-label">MANA</span>
             <span class="mana-value">${gs.opponent.mana}/${gs.opponent.maxMana}</span>
@@ -79,21 +78,20 @@ export function renderBoard() {
         </div>
       </div>
 
-      <!-- DIVIDER -->
       <div class="board-divider">
         <div class="turn-info">
           <span class="turn-label">${gs.turn === 'player' ? '⚔️ Your Turn' : '⏳ Opponent\'s Turn'}</span>
           <span class="phase-label">${gs.phase === 'play' ? 'Play Phase' : 'Attack Phase'}</span>
         </div>
-        ${gs.turn === 'player' ? `
-          <div class="action-buttons">
+        <div class="action-buttons">
+          <button class="btn-back-menu" id="btn-back-menu">🏠 Menu</button>
+          ${gs.turn === 'player' ? `
             ${gs.phase === 'play' ? `<button class="btn-phase" id="btn-attack-phase">Attack Phase →</button>` : ''}
             ${gs.phase === 'attack' ? `<button class="btn-end-turn" id="btn-end-turn">End Turn ⏭</button>` : ''}
-          </div>
-        ` : ''}
+          ` : ''}
+        </div>
       </div>
 
-      <!-- PLAYER SIDE -->
       <div class="player-area player-area-bottom">
         <div class="hand-area player-hand" id="player-hand">
           ${gs.player.hand.map(c => renderCard(c, 'hand')).join('')}
@@ -113,10 +111,8 @@ export function renderBoard() {
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- MESSAGE LOG -->
     <div class="message-log" id="message-log">
       ${gs.log.slice(-4).map(m => `<div class="log-entry">${m}</div>`).join('')}
     </div>
@@ -127,6 +123,7 @@ export function renderBoard() {
           <div class="game-over-title">${gs.winner === 'player' ? '🏆 Victory!' : '💀 Defeat'}</div>
           <div class="game-over-sub">${gs.winner === 'player' ? 'The opponent has fallen!' : 'You have been defeated!'}</div>
           <button class="btn-restart" id="btn-restart">Play Again</button>
+          <button class="btn-restart" id="btn-menu" style="margin-top:10px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:#c9a84c;">🏠 Menu</button>
         </div>
       </div>
     ` : ''}
@@ -134,9 +131,7 @@ export function renderBoard() {
   attachEvents()
 }
 
-// ── ATTACH CLICK EVENTS
 function attachEvents() {
-  // Play card from hand
   document.querySelectorAll('.card[data-context="hand"]').forEach(el => {
     el.addEventListener('click', () => {
       const uid = parseInt(el.dataset.uid)
@@ -145,7 +140,6 @@ function attachEvents() {
     })
   })
 
-  // Select/attack with board card
   document.querySelectorAll('.card[data-context="board"]').forEach(el => {
     el.addEventListener('click', () => {
       const uid = parseInt(el.dataset.uid)
@@ -154,7 +148,6 @@ function attachEvents() {
     })
   })
 
-  // Attack opponent hero portrait
   document.getElementById('opponent-hero')?.addEventListener('click', () => {
     if (gameState.selectedCard && gameState.phase === 'attack' && gameState.turn === 'player') {
       const attacker = gameState.selectedCard
@@ -167,7 +160,6 @@ function attachEvents() {
     }
   })
 
-  // Phase / end turn buttons
   document.getElementById('btn-attack-phase')?.addEventListener('click', () => {
     gameState.phase = 'attack'
     gameState.log.push('⚔️ Attack phase started.')
@@ -179,10 +171,31 @@ function attachEvents() {
     renderBoard()
   })
 
+  document.getElementById('btn-back-menu')?.addEventListener('click', () => {
+    router.go('menu')
+  })
+
   document.getElementById('btn-restart')?.addEventListener('click', () => {
-    location.reload()
+    router.go('game')
+  })
+
+  document.getElementById('btn-menu')?.addEventListener('click', () => {
+    router.go('menu')
   })
 }
 
+// ── ROUTER
+router.onChange((page) => {
+  if (page === 'menu') renderMenu()
+  if (page === 'deckbuilder') renderDeckBuilder()
+  if (page === 'game') {
+    // Reset game state by reloading game module
+    import('./game.js').then(m => {
+      Object.assign(gameState, m.freshGame())
+      renderBoard()
+    })
+  }
+})
+
 // ── START
-renderBoard()
+renderMenu()
