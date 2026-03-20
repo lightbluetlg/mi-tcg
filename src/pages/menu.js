@@ -1,6 +1,7 @@
 import { router as appRouter } from '../router.js'
 import { getAllDecks } from './deckbuilder.js'
 import { allCards } from '../cards.js'
+import { BASE } from '../main.js'
 
 const rarityFrames = {
   uncommon: 'RavenCard_Green_Frame.png',
@@ -72,7 +73,7 @@ export function renderMenu() {
             <div class="sidebar-mode ${mode.id === selectedMode ? 'active' : ''} ${!mode.available ? 'coming-soon' : ''}" data-mode="${mode.id}">
               <div class="mode-art">
                 ${readyDecks.length > 0 && mode.available ? `
-                  <img src="/cards/${allCards[Math.floor(Math.random() * 10)].image}" style="width:100%;height:100%;object-fit:cover;opacity:0.4;" />
+                  <img src="${BASE}cards/${allCards[Math.floor(Math.random() * 10)].image}" style="width:100%;height:100%;object-fit:cover;opacity:0.4;" />
                 ` : ''}
               </div>
               <div class="mode-info">
@@ -102,7 +103,7 @@ export function renderMenu() {
                   <div class="center-deck ${ready ? 'ready' : 'empty'} ${isSelected ? 'selected' : ''}" data-slot="${d.slot}">
                     <div class="center-deck-art">
                       ${coverCard ? `
-                        <img src="/cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
+                        <img src="${BASE}cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
                         <div style="position:absolute;inset:0;">
                           <img src="/${frame}" style="width:100%;height:100%;object-fit:fill;" />
                         </div>
