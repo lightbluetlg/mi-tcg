@@ -1,7 +1,8 @@
 import './style.css'
 import { router } from './router.js'
 import { renderMenu } from './pages/menu.js'
-import { renderDeckBuilder, getSavedDeck } from './pages/deckbuilder.js'
+import { renderDeckBuilder, getSavedDeck, getAllDecks } from './pages/deckbuilder.js'
+import { renderPreMatch } from './pages/prematch.js'
 import { gameState, playCard, attackWithCard, endTurn, checkWin } from './game.js'
 import { allCards } from './cards.js'
 import { playSound, toggleMute, isMuted } from './audio.js'
@@ -405,13 +406,14 @@ function attachEvents() {
 }
 
 // ── ROUTER
-router.onChange((page) => {
+router.onChange((page, params) => {
   removeTooltip()
   if (page === 'menu') renderMenu()
   if (page === 'deckbuilder') renderDeckBuilder()
+  if (page === 'prematch') renderPreMatch()
   if (page === 'game') {
     import('./game.js').then(m => {
-      const fresh = m.freshGame()
+      const fresh = m.freshGame(params?.slot)
       Object.assign(gameState, fresh)
       renderBoard()
       if (fresh._opponentGoesFirst) {

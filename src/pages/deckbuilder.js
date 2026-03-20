@@ -1,19 +1,31 @@
 import { router } from '../router.js'
 import { allCards } from '../cards.js'
 
-const DECK_KEY = 'ravenclash_deck_1'
 const MAX_COPIES = 2
 const DECK_SIZE = 20
+const MAX_DECKS = 5
 
-export function getSavedDeck() {
-  try {
-    const saved = localStorage.getItem(DECK_KEY)
-    return saved ? JSON.parse(saved) : []
-  } catch { return [] }
+export function getDeckKey(slot) {
+  return `ravenclash_deck_${slot}`
 }
 
-function saveDeck(deck) {
-  localStorage.setItem(DECK_KEY, JSON.stringify(deck))
+export function getSavedDeck(slot = 1) {
+  try {
+    const saved = localStorage.getItem(getDeckKey(slot))
+    return saved ? JSON.parse(saved) : null
+  } catch { return null }
+}
+
+export function getAllDecks() {
+  return Array.from({ length: MAX_DECKS }, (_, i) => {
+    const slot = i + 1
+    const data = getSavedDeck(slot)
+    return { slot, ...( data || { cards: [], name: `Deck ${slot}`, coverId: null }) }
+  })
+}
+
+function saveDeck(slot, cards, name, coverId) {
+  localStorage.setItem(getDeckKey(slot), JSON.stringify({ cards, name, coverId }))
 }
 
 const rarityFrames = {
@@ -25,8 +37,33 @@ const rarityFrames = {
 
 const rarityOrder = { uncommon: 1, rare: 2, epic: 3, legendary: 4 }
 
+let currentSlot = 1
 let filters = { search: '', rarity: 'all', mana: 'all' }
-let deck = getSavedDeck()
+let deck = []
+let deckName = 'My Deck'
+let coverId = null
+let pickingCover = false
+
+function loadSlot(slot) {
+  currentSlot = slot
+  const saved = getSavedDeck(slot)
+  if (!saved) {
+    deck = []
+    deckName = `Deck ${slot}`
+    coverId = null
+  } else if (Array.isArray(saved)) {
+    // Old format — plain array
+    deck = [...saved]
+    deckName = `Deck ${slot}`
+    coverId = null
+  } else {
+    // New format — object with cards/name/coverId
+    deck = saved.cards ? [...saved.cards] : []
+    deckName = saved.name || `Deck ${slot}`
+    coverId = saved.coverId || null
+  }
+  pickingCover = false
+}
 
 function getFilteredCards() {
   return allCards.filter(card => {
@@ -44,15 +81,17 @@ function countInDeck(cardId) {
 function renderCardThumb(card) {
   const count = countInDeck(card.id)
   const maxed = count >= MAX_COPIES
+  const isCover = coverId === card.id
   return `
-    <div class="thumb-card ${maxed ? 'maxed' : ''} rarity-${card.rarity}" data-id="${card.id}">
+    <div class="thumb-card ${maxed && !pickingCover ? 'maxed' : ''} ${isCover ? 'is-cover' : ''} rarity-${card.rarity}" data-id="${card.id}">
       <div class="thumb-image">
         <img src="/cards/${card.image}" alt="${card.name}" />
         <div class="thumb-frame">
           <img src="/${rarityFrames[card.rarity]}" alt="" />
         </div>
         <div class="thumb-mana">${card.mana}</div>
-        ${count > 0 ? `<div class="thumb-count">×${count}</div>` : ''}
+        ${isCover ? '<div class="cover-badge">✦</div>' : ''}
+        ${count > 0 && !pickingCover ? `<div class="thumb-count">×${count}</div>` : ''}
       </div>
       <div class="thumb-name">${card.name}</div>
       <div class="thumb-stats">⚔️${card.attack} 🩸${card.hp}</div>
@@ -66,9 +105,7 @@ function renderDeckList() {
     if (!grouped[card.id]) grouped[card.id] = { card, count: 0 }
     grouped[card.id].count++
   })
-
   const entries = Object.values(grouped).sort((a, b) => a.card.mana - b.card.mana)
-
   return entries.map(({ card, count }) => `
     <div class="deck-entry rarity-${card.rarity}" data-id="${card.id}">
       <div class="deck-entry-mana">${card.mana}</div>
@@ -79,9 +116,12 @@ function renderDeckList() {
   `).join('')
 }
 
-export function renderDeckBuilder() {
+export function renderDeckBuilder(slot = currentSlot) {
+  if (slot !== currentSlot) loadSlot(slot)
   const filtered = getFilteredCards()
   const deckCount = deck.length
+  const deckReady = deckCount === DECK_SIZE
+  const coverCard = coverId ? allCards.find(c => c.id === coverId) : null
 
   document.querySelector('#app').innerHTML = `
     <div class="deckbuilder-screen">
@@ -89,7 +129,26 @@ export function renderDeckBuilder() {
       <!-- LEFT: Card Collection -->
       <div class="collection-panel">
         <div class="collection-header">
-          <h2 class="panel-title">📖 Collection</h2>
+
+          <!-- Deck slot selector -->
+          <div class="deck-slots">
+            ${Array.from({ length: MAX_DECKS }, (_, i) => {
+              const s = i + 1
+              const d = getSavedDeck(s)
+              const ready = d && d.cards && d.cards.length === DECK_SIZE
+              return `<button class="deck-slot-btn ${s === currentSlot ? 'active' : ''} ${ready ? 'ready' : ''}" data-slot="${s}">
+                ${d && d.coverId ? `<img src="/cards/${allCards.find(c => c.id === d.coverId)?.image}" class="slot-cover" />` : ''}
+                <span class="slot-label">${d && d.name ? d.name : `Deck ${s}`}</span>
+                ${ready ? '<span class="slot-ready">✓</span>' : ''}
+              </button>`
+            }).join('')}
+          </div>
+
+          <div class="deck-name-row">
+            <h2 class="panel-title">📖 Collection</h2>
+            <input class="deck-name-input" id="deck-name-input" value="${deckName}" placeholder="Deck name..." maxlength="20" />
+          </div>
+
           <div class="filters">
             <input class="filter-search" id="filter-search" placeholder="Search cards..." value="${filters.search}" />
             <select class="filter-select" id="filter-rarity">
@@ -106,8 +165,11 @@ export function renderDeckBuilder() {
               `).join('')}
             </select>
           </div>
+
+          ${pickingCover ? `<div class="cover-hint">✦ Click any card to set it as your deck cover</div>` : ''}
           <div class="collection-count">${filtered.length} cards</div>
         </div>
+
         <div class="card-grid" id="card-grid">
           ${filtered.map(renderCardThumb).join('')}
         </div>
@@ -117,7 +179,25 @@ export function renderDeckBuilder() {
       <div class="deck-panel">
         <div class="deck-header">
           <h2 class="panel-title">🗡️ Your Deck</h2>
-          <div class="deck-count ${deckCount === DECK_SIZE ? 'complete' : ''}">${deckCount} / ${DECK_SIZE}</div>
+          <div class="deck-count ${deckReady ? 'complete' : ''}">${deckCount} / ${DECK_SIZE}</div>
+        </div>
+
+        <!-- Cover card preview -->
+        <div class="deck-cover-section">
+          ${coverCard ? `
+            <div class="deck-cover-preview">
+              <div class="thumb-image" style="width:70px;height:95px;position:relative;border-radius:6px;overflow:hidden;">
+                <img src="/cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
+                <div class="thumb-frame" style="position:absolute;inset:0;">
+                  <img src="/${rarityFrames[coverCard.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
+                </div>
+              </div>
+              <span class="cover-card-name">${coverCard.name}</span>
+            </div>
+          ` : '<div class="no-cover">No cover selected</div>'}
+          <button class="btn-pick-cover ${pickingCover ? 'active' : ''}" id="btn-pick-cover">
+            ${pickingCover ? '✕ Cancel' : '🖼 Set Cover'}
+          </button>
         </div>
 
         <div class="deck-list" id="deck-list">
@@ -128,8 +208,8 @@ export function renderDeckBuilder() {
         </div>
 
         <div class="deck-actions">
-          ${deckCount === DECK_SIZE
-            ? `<button class="btn-save-deck" id="btn-save">✅ Deck Saved!</button>`
+          ${deckReady
+            ? `<button class="btn-save-deck" id="btn-save">✅ Deck Ready!</button>`
             : `<button class="btn-save-deck inactive" id="btn-save">Need ${DECK_SIZE - deckCount} more cards</button>`
           }
           <button class="btn-clear-deck" id="btn-clear">🗑 Clear</button>
@@ -143,38 +223,66 @@ export function renderDeckBuilder() {
 }
 
 function attachDeckEvents() {
-      const grid = document.getElementById('card-grid')
-  const savedScroll = grid ? grid.scrollTop : 0
+  // Slot selector
+  document.querySelectorAll('.deck-slot-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const slot = parseInt(btn.dataset.slot)
+      filters = { search: '', rarity: 'all', mana: 'all' }
+      renderDeckBuilder(slot)
+    })
+  })
+
+  // Deck name
+  document.getElementById('deck-name-input')?.addEventListener('input', e => {
+    deckName = e.target.value
+    saveDeck(currentSlot, deck, deckName, coverId)
+  })
+
   // Search
   document.getElementById('filter-search')?.addEventListener('input', e => {
     filters.search = e.target.value
-    renderDeckBuilder()
+    renderDeckBuilder(currentSlot)
   })
 
   // Rarity filter
   document.getElementById('filter-rarity')?.addEventListener('change', e => {
     filters.rarity = e.target.value
-    renderDeckBuilder()
+    renderDeckBuilder(currentSlot)
   })
 
   // Mana filter
   document.getElementById('filter-mana')?.addEventListener('change', e => {
     filters.mana = e.target.value
-    renderDeckBuilder()
+    renderDeckBuilder(currentSlot)
   })
 
-  // Add card
+  // Pick cover button
+  document.getElementById('btn-pick-cover')?.addEventListener('click', () => {
+    pickingCover = !pickingCover
+    renderDeckBuilder(currentSlot)
+  })
+
+  // Card click
   document.querySelectorAll('.thumb-card').forEach(el => {
     el.addEventListener('click', () => {
       const id = parseInt(el.dataset.id)
       const card = allCards.find(c => c.id === id)
       if (!card) return
+
+      if (pickingCover) {
+        coverId = id
+        pickingCover = false
+        saveDeck(currentSlot, deck, deckName, coverId)
+        renderDeckBuilder(currentSlot)
+        return
+      }
+
       if (deck.length >= DECK_SIZE) return
       if (countInDeck(id) >= MAX_COPIES) return
       const scrollPos = document.getElementById('card-grid')?.scrollTop || 0
       deck.push(card)
-      saveDeck(deck)
-      renderDeckBuilder()
+      saveDeck(currentSlot, deck, deckName, coverId)
+      renderDeckBuilder(currentSlot)
       requestAnimationFrame(() => {
         const newGrid = document.getElementById('card-grid')
         if (newGrid) newGrid.scrollTop = scrollPos
@@ -189,16 +297,16 @@ function attachDeckEvents() {
       const id = parseInt(el.dataset.id)
       const idx = deck.findIndex(c => c.id === id)
       if (idx !== -1) deck.splice(idx, 1)
-      saveDeck(deck)
-      renderDeckBuilder()
+      saveDeck(currentSlot, deck, deckName, coverId)
+      renderDeckBuilder(currentSlot)
     })
   })
 
   // Clear deck
   document.getElementById('btn-clear')?.addEventListener('click', () => {
     deck = []
-    saveDeck(deck)
-    renderDeckBuilder()
+    saveDeck(currentSlot, deck, deckName, coverId)
+    renderDeckBuilder(currentSlot)
   })
 
   // Back

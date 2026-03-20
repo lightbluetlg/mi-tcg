@@ -15,9 +15,11 @@ function shuffle(arr) {
   return a
 }
 
-function buildDeck() {
-  const saved = localStorage.getItem('ravenclash_deck_1')
-  const base = saved ? JSON.parse(saved) : [...allCards, ...allCards].slice(0, 20)
+function buildDeck(slot = 1) {
+  const saved = localStorage.getItem(`ravenclash_deck_${slot}`)
+  const data = saved ? JSON.parse(saved) : null
+  const cards = data?.cards || (Array.isArray(data) ? data : null)
+  const base = cards && cards.length > 0 ? cards : [...allCards, ...allCards].slice(0, 20)
   return shuffle([...base]).map(card => ({
     ...card,
     uid: makeUID(),
@@ -377,8 +379,8 @@ export function checkWin() {
   }
 }
 
-export function freshGame() {
-  const pd = buildDeck()
+export function freshGame(slot = 1) {
+  const pd = buildDeck(slot)
   const od = buildOpponentDeck()
   const fresh = {
     turn: 'player',
