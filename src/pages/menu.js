@@ -51,7 +51,10 @@ export function renderMenu() {
         <div class="topbar-profile">
           <div class="topbar-avatar">⚔️</div>
           <div class="topbar-info">
-            <input class="topbar-name-input" id="topbar-name" value="${playerName}" maxlength="20" />
+            <div class="topbar-name-wrapper">
+              <input class="topbar-name-input" id="topbar-name" value="${playerName}" maxlength="20" />
+              <span class="topbar-name-pencil">✏️</span>
+            </div>
             <div class="topbar-stats">${readyDecks.length} deck${readyDecks.length !== 1 ? 's' : ''} ready</div>
           </div>
         </div>

@@ -2175,3 +2175,20 @@ body {
   filter: grayscale(0);
   transform: translateY(-4px);
 }
+
+.topbar-name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.topbar-name-pencil {
+  font-size: 11px;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.topbar-name-pencil:hover {
+  opacity: 1;
+}
