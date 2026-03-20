@@ -200,6 +200,64 @@ function removeTooltip() {
   document.getElementById('card-tooltip')?.remove()
 }
 
+// ── ANIMATIONS
+export function floatDamage(amount, el, isHeal = false) {
+  const rect = el.getBoundingClientRect()
+  const num = document.createElement('div')
+  num.className = `damage-number ${isHeal ? 'heal-dmg' : 'attack-dmg'}`
+  num.textContent = isHeal ? `+${amount}` : `-${amount}`
+  num.style.left = `${rect.left + rect.width / 2 - 20}px`
+  num.style.top = `${rect.top + rect.height / 2 - 20}px`
+  document.body.appendChild(num)
+  setTimeout(() => num.remove(), 1200)
+}
+
+export function animateCardHit(uid) {
+  const el = document.querySelector(`[data-uid="${uid}"]`)
+  if (!el) return
+  el.classList.remove('card-shake', 'card-hit')
+  void el.offsetWidth // force reflow
+  el.classList.add('card-shake', 'card-hit')
+  floatDamage('💥', el)
+  setTimeout(() => el.classList.remove('card-shake', 'card-hit'), 400)
+}
+
+export function animateCardDeath(uid) {
+  return new Promise(resolve => {
+    const el = document.querySelector(`[data-uid="${uid}"]`)
+    if (!el) return resolve()
+    el.classList.add('card-dying')
+    setTimeout(resolve, 600)
+  })
+}
+
+export function animateCardPlayed(uid) {
+  const el = document.querySelector(`[data-uid="${uid}"]`)
+  if (!el) return
+  el.classList.add('card-played')
+  setTimeout(() => el.classList.remove('card-played'), 500)
+}
+
+export function animateCardLunge(uid, direction = 'up') {
+  return new Promise(resolve => {
+    const el = document.querySelector(`[data-uid="${uid}"]`)
+    if (!el) return resolve()
+    el.classList.add(`card-lunge-${direction}`)
+    setTimeout(() => {
+      el.classList.remove(`card-lunge-${direction}`)
+      resolve()
+    }, 400)
+  })
+}
+
+export function animateHeroHit(side) {
+  const el = document.querySelector(`.${side}-portrait`)
+  if (!el) return
+  el.classList.add('hero-shake', 'hero-hit')
+  const rect = el.getBoundingClientRect()
+  floatDamage('💥', el)
+  setTimeout(() => el.classList.remove('hero-shake', 'hero-hit'), 500)
+}
 // ── ATTACH EVENTS
 function attachEvents() {
   // Tooltips
@@ -226,9 +284,9 @@ function attachEvents() {
 
   // Attack with board card
   document.querySelectorAll('.card[data-context="board"]').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', async () => {
       const uid = parseInt(el.dataset.uid)
-      attackWithCard(uid)
+      await attackWithCard(uid)
       renderBoard()
     })
   })
@@ -239,6 +297,7 @@ function attachEvents() {
       const attacker = gameState.selectedCard
       gameState.opponent.hp -= attacker.attack
       attacker.exhausted = true
+      animateHeroHit('opponent')
       gameState.log.push(`⚔️ ${attacker.name} struck the opponent hero for ${attacker.attack} damage!`)
       gameState.selectedCard = null
       checkWin()
@@ -292,12 +351,6 @@ router.onChange((page) => {
     })
   }
 })
-
-export function triggerOpponentFirst() {
-  if (gameState._opponentGoesFirst) {
-    opponentTurn()
-  }
-}
 
 // ── START
 renderMenu()

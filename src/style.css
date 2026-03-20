@@ -1219,3 +1219,119 @@ body {
   background: #1a1a2e;
   color: #fff;
 }
+
+/* ══════════════════════════════
+   ANIMATIONS
+══════════════════════════════ */
+
+/* Damage number floating up */
+.damage-number {
+  position: fixed;
+  font-family: 'Barlow', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 500;
+  animation: damage-float 1.2s ease-out forwards;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.damage-number.attack-dmg { color: #ff4444; }
+.damage-number.heal-dmg   { color: #44ff88; }
+
+@keyframes damage-float {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  30%  { opacity: 1; transform: translateY(-20px) scale(1.3); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+}
+
+/* Card shake when taking damage */
+@keyframes card-shake {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-8px) rotate(-2deg); }
+  30%  { transform: translateX(8px) rotate(2deg); }
+  45%  { transform: translateX(-6px) rotate(-1deg); }
+  60%  { transform: translateX(6px) rotate(1deg); }
+  75%  { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+.card-shake {
+  animation: card-shake 0.4s ease-out !important;
+}
+
+/* Card flash red when hit */
+@keyframes card-hit-flash {
+  0%   { filter: brightness(1) drop-shadow(0 0 0px transparent); }
+  25%  { filter: brightness(2) drop-shadow(0 0 12px rgba(255,0,0,0.9)); }
+  100% { filter: brightness(1) drop-shadow(0 0 0px transparent); }
+}
+
+.card-hit {
+  animation: card-hit-flash 0.4s ease-out !important;
+}
+
+/* Card death fade out */
+@keyframes card-death {
+  0%   { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1); }
+  30%  { opacity: 0.8; transform: scale(1.1) rotate(-3deg); filter: brightness(2) drop-shadow(0 0 16px rgba(255,60,60,0.9)); }
+  100% { opacity: 0; transform: scale(0.6) rotate(8deg) translateY(20px); filter: brightness(0.5); }
+}
+
+.card-dying {
+  animation: card-death 0.6s ease-out forwards !important;
+  pointer-events: none;
+}
+
+/* Card lunge forward (attack) */
+@keyframes card-lunge-up {
+  0%   { transform: translateY(0) scale(1); }
+  40%  { transform: translateY(-30px) scale(1.08); }
+  70%  { transform: translateY(-20px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes card-lunge-down {
+  0%   { transform: translateY(0) scale(1); }
+  40%  { transform: translateY(30px) scale(1.08); }
+  70%  { transform: translateY(20px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.card-lunge-up   { animation: card-lunge-up   0.4s ease-out !important; }
+.card-lunge-down { animation: card-lunge-down 0.4s ease-out !important; }
+
+/* Card glow when played to board */
+@keyframes card-played {
+  0%   { filter: brightness(1.5) drop-shadow(0 0 20px rgba(252,211,77,0.9)); transform: scale(1.15) translateY(-10px); }
+  100% { filter: brightness(1) drop-shadow(0 0 0px transparent); transform: scale(1) translateY(0); }
+}
+
+.card-played {
+  animation: card-played 0.5s ease-out !important;
+}
+
+/* Hero shake when hit */
+@keyframes hero-shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-10px) rotate(-2deg); }
+  40%  { transform: translateX(10px) rotate(2deg); }
+  60%  { transform: translateX(-6px); }
+  80%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+.hero-shake {
+  animation: hero-shake 0.5s ease-out !important;
+}
+
+/* Hero flash red */
+@keyframes hero-hit-flash {
+  0%   { box-shadow: 0 0 12px rgba(201,168,76,0.2); border-color: #c9a84c; }
+  30%  { box-shadow: 0 0 30px rgba(255,0,0,0.9), 0 0 0 3px #ff4444; border-color: #ff4444; }
+  100% { box-shadow: 0 0 12px rgba(201,168,76,0.2); border-color: #c9a84c; }
+}
+
+.hero-hit {
+  animation: hero-hit-flash 0.5s ease-out !important;
+}

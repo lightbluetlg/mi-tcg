@@ -1,3 +1,4 @@
+import { animateCardHit, animateCardDeath, animateCardLunge, animateHeroHit, animateCardPlayed, floatDamage } from './main.js'
 import { allCards } from './cards.js'
 
 // ── HELPERS
@@ -105,10 +106,11 @@ export function playCard(uid) {
   card.exhausted = false
   gameState.player.board.push(card)
   gameState.log.push(`▶️ You played ${card.name}.`)
+  setTimeout(() => animateCardPlayed(card.uid), 50)
 }
 
 // ── ATTACK WITH A CARD
-export function attackWithCard(uid) {
+export async function attackWithCard(uid) {
   if (gameState.turn !== 'player' || gameState.phase !== 'attack') return
 
   const attacker = gameState.player.board.find(c => c.uid === uid)
@@ -135,24 +137,47 @@ export function attackWithCard(uid) {
     const selected = gameState.selectedCard
     const target = gameState.opponent.board.find(c => c.uid === uid)
     if (target) {
-      resolveCombat(selected, target)
+      await resolveCombat(selected, target)
       gameState.selectedCard = null
     }
   }
 }
 
 // ── COMBAT RESOLUTION
-function resolveCombat(attacker, defender) {
+async function resolveCombat(attacker, defender) {
+  // Lunge animations
+  const attackerIsPlayer = !attacker.isOpponent
+  await animateCardLunge(attacker.uid, attackerIsPlayer ? 'up' : 'down')
+
+  // Hit animations
+  animateCardHit(defender.uid)
+  animateCardHit(attacker.uid)
+
+  // Floating damage numbers
+  const defenderEl = document.querySelector(`[data-uid="${defender.uid}"]`)
+  const attackerEl = document.querySelector(`[data-uid="${attacker.uid}"]`)
+  if (defenderEl) floatDamage(attacker.attack, defenderEl)
+  if (attackerEl) floatDamage(defender.attack, attackerEl)
+
+  // Apply damage
   attacker.currentHp -= defender.attack
   defender.currentHp -= attacker.attack
   attacker.exhausted = true
+
   gameState.log.push(`⚔️ ${attacker.name} (${attacker.attack} atk) vs ${defender.name} (${defender.attack} atk)`)
 
+  // Death animations
+  const dyingUids = []
+  if (attacker.currentHp <= 0) { dyingUids.push(attacker.uid); gameState.log.push(`💀 ${attacker.name} died.`) }
+  if (defender.currentHp <= 0) { dyingUids.push(defender.uid); gameState.log.push(`💀 ${defender.name} died.`) }
+
+  if (dyingUids.length > 0) {
+    await Promise.all(dyingUids.map(uid => animateCardDeath(uid)))
+  }
+
+  // Remove dead creatures
   gameState.player.board   = gameState.player.board.filter(c => c.currentHp > 0)
   gameState.opponent.board = gameState.opponent.board.filter(c => c.currentHp > 0)
-
-  if (attacker.currentHp <= 0) gameState.log.push(`💀 ${attacker.name} died.`)
-  if (defender.currentHp <= 0) gameState.log.push(`💀 ${defender.name} died.`)
 }
 
 // ── END TURN
@@ -165,7 +190,7 @@ export function endTurn() {
 }
 
 // ── OPPONENT AI
-function opponentTurn() {
+async function opponentTurn() {
   const opp = gameState.opponent
 
   // Gain mana (skip increment on very first turn if opponent went first)
@@ -196,19 +221,22 @@ function opponentTurn() {
   }
 
   // Attack with eligible creatures
+  const attackPromises = []
   opp.board.forEach(attacker => {
     if (attacker.canAttack && !attacker.exhausted) {
       if (gameState.player.board.length > 0) {
         const target = gameState.player.board[Math.floor(Math.random() * gameState.player.board.length)]
-        resolveCombat(attacker, target)
+        attackPromises.push(resolveCombat(attacker, target))
       } else {
         gameState.player.hp -= attacker.attack
         attacker.exhausted = true
+        animateHeroHit('player')
         gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${attacker.attack}!`)
         checkWin()
       }
     }
   })
+  await Promise.all(attackPromises)
 
   // Draw a card
   if (opp.deck.length > 0) opp.hand.push(opp.deck.shift())
@@ -271,4 +299,10 @@ export function freshGame() {
     fresh.player.maxMana = 1
   }
   return fresh
+}
+
+export function triggerOpponentFirst() {
+  if (gameState._opponentGoesFirst) {
+    opponentTurn()
+  }
 }
