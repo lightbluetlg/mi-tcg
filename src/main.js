@@ -77,6 +77,12 @@ export function renderBoard() {
             <span class="mana-label">MANA</span>
             <span class="mana-value">${gs.opponent.mana}/${gs.opponent.maxMana}</span>
           </div>
+          <div class="graveyard-icon" id="graveyard-opponent" data-side="opponent">
+            💀 <span class="graveyard-count">${gs.opponent.graveyard.length}</span>
+          </div>
+          <div class="deck-icon">
+            📚 <span class="deck-count-display">${gs.opponent.deck.length}</span>
+          </div>
         </div>
       </div>
 
@@ -112,6 +118,12 @@ export function renderBoard() {
             <span class="mana-label">MANA</span>
             <span class="mana-value">${gs.player.mana}/${gs.player.maxMana}</span>
           </div>
+          <div class="graveyard-icon" id="graveyard-player" data-side="player">
+            💀 <span class="graveyard-count">${gs.player.graveyard.length}</span>
+          </div>
+          <div class="deck-icon">
+            📚 <span class="deck-count-display">${gs.player.deck.length}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -120,6 +132,7 @@ export function renderBoard() {
       ${gs.log.slice(-4).map(m => `<div class="log-entry">${m}</div>`).join('')}
     </div>
 
+    ${graveyardOpen ? renderGraveyardOverlay() : ''}
     ${gs.gameOver ? `
       <div class="game-over-overlay">
         <div class="game-over-box">
@@ -262,6 +275,56 @@ export function animateHeroHit(side) {
   setTimeout(() => el.classList.remove('hero-shake', 'hero-hit'), 500)
 }
 
+// ── GRAVEYARD
+let graveyardOpen = false
+let graveyardSide = 'player'
+
+export function toggleGraveyard(side) {
+  if (graveyardOpen && graveyardSide === side) {
+    graveyardOpen = false
+  } else {
+    graveyardOpen = true
+    graveyardSide = side
+  }
+  renderBoard()
+}
+
+function renderGraveyardOverlay() {
+  const graveyard = graveyardSide === 'player'
+    ? gameState.player.graveyard
+    : gameState.opponent.graveyard
+  const title = graveyardSide === 'player' ? 'Your Graveyard' : "Opponent's Graveyard"
+
+  return `
+    <div class="graveyard-overlay" id="graveyard-overlay">
+      <div class="graveyard-panel">
+        <div class="graveyard-header">
+          <div class="graveyard-title">💀 ${title}</div>
+          <button class="graveyard-close" id="graveyard-close">✕</button>
+        </div>
+        <div class="graveyard-cards">
+          ${graveyard.length === 0
+            ? '<div class="graveyard-empty">No dead creatures yet</div>'
+            : graveyard.map(card => `
+              <div class="graveyard-card rarity-${card.rarity}">
+                <div class="thumb-image" style="width:80px;height:107px;position:relative;border-radius:6px;overflow:hidden;">
+                  <img src="/cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
+                  <div class="thumb-frame" style="position:absolute;inset:0;">
+                    <img src="/${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
+                  </div>
+                  <div style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a5fa0,#0a2040);border:1px solid #90cdf4;display:flex;align-items:center;justify-content:center;font-family:Barlow,sans-serif;font-size:10px;font-weight:700;color:#fff;z-index:10;">${card.mana}</div>
+                </div>
+                <div style="font-family:'Passion One',sans-serif;font-size:9px;color:#f0d080;text-align:center;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:80px;">${card.name}</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:9px;text-align:center;color:rgba(255,255,255,0.4);">⚔️${card.attack} 🩸${card.hp}</div>
+              </div>
+            `).join('')
+          }
+        </div>
+      </div>
+    </div>
+  `
+}
+
 export function animateCardPlayedFromHand(card, isOpponent = false) {
   return new Promise(resolve => {
     const rarityFrame = rarityFrames[card.rarity]
@@ -339,6 +402,13 @@ function attachEvents() {
     el.addEventListener('mouseleave', removeTooltip)
   })
 
+  // Graveyard icons
+  document.getElementById('graveyard-opponent')?.addEventListener('click', () => toggleGraveyard('opponent'))
+  document.getElementById('graveyard-player')?.addEventListener('click', () => toggleGraveyard('player'))
+  document.getElementById('graveyard-close')?.addEventListener('click', () => {
+    graveyardOpen = false
+    renderBoard()
+  })
   // Play card from hand
   document.querySelectorAll('.card[data-context="hand"]').forEach(el => {
     el.addEventListener('click', () => {

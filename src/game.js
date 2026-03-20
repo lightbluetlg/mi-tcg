@@ -60,6 +60,8 @@ export const gameState = {
     hand: [],
     board: [],
     deck: [],
+    graveyard: [],
+    fatigueDamage: 0,
   },
   opponent: {
     hp: 20,
@@ -68,6 +70,8 @@ export const gameState = {
     hand: [],
     board: [],
     deck: [],
+    graveyard: [],
+    fatigueDamage: 0,
   }
 }
 
@@ -181,7 +185,9 @@ async function resolveCombat(attacker, defender) {
     await Promise.all(dyingUids.map(uid => animateCardDeath(uid)))
   }
 
-  // Remove dead creatures
+  // Move dead creatures to graveyard
+  gameState.player.board.forEach(c => { if (c.currentHp <= 0) gameState.player.graveyard.push({...c}) })
+  gameState.opponent.board.forEach(c => { if (c.currentHp <= 0) gameState.opponent.graveyard.push({...c}) })
   gameState.player.board   = gameState.player.board.filter(c => c.currentHp > 0)
   gameState.opponent.board = gameState.opponent.board.filter(c => c.currentHp > 0)
 }
@@ -343,8 +349,15 @@ async function opponentTurn() {
     }
   }
 
-  // Draw a card
-  if (opp.deck.length > 0) opp.hand.push(opp.deck.shift())
+  // Draw a card (opponent) — fatigue if empty
+  if (opp.deck.length > 0) {
+    opp.hand.push(opp.deck.shift())
+  } else {
+    opp.fatigueDamage += 1
+    opp.hp -= opp.fatigueDamage
+    gameState.log.push(`💀 Opponent has no cards! Fatigue deals ${opp.fatigueDamage} damage.`)
+    checkWin()
+  }
 
   // Start player turn
   gameState.turn = 'player'
@@ -354,7 +367,16 @@ async function opponentTurn() {
   gameState.player.maxMana = Math.min(10, gameState.player.maxMana + 1)
   gameState.player.mana = gameState.player.maxMana
   gameState.player.board.forEach(c => { c.canAttack = true; c.exhausted = false })
-  if (gameState.player.deck.length > 0) gameState.player.hand.push(gameState.player.deck.shift())
+
+  // Draw a card (player) — fatigue if empty
+  if (gameState.player.deck.length > 0) {
+    gameState.player.hand.push(gameState.player.deck.shift())
+  } else {
+    gameState.player.fatigueDamage += 1
+    gameState.player.hp -= gameState.player.fatigueDamage
+    gameState.log.push(`💀 You have no cards! Fatigue deals ${gameState.player.fatigueDamage} damage.`)
+    checkWin()
+  }
 
   playSound('turn')
   playSound('card_draw')
@@ -392,8 +414,8 @@ export function freshGame(slot = 1) {
     log: [],
     _opponentGoesFirst: false,
     _skipOpponentManaIncrement: false,
-    player: { hp: 20, mana: 0, maxMana: 0, hand: pd.slice(0, 5), deck: pd.slice(5), board: [] },
-    opponent: { hp: 20, mana: 0, maxMana: 0, hand: od.slice(0, 5), deck: od.slice(5), board: [] },
+    player: { hp: 20, mana: 0, maxMana: 0, hand: pd.slice(0, 5), deck: pd.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
+    opponent: { hp: 20, mana: 0, maxMana: 0, hand: od.slice(0, 5), deck: od.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
   }
   if (Math.random() < 0.5) {
     fresh.turn = 'opponent'

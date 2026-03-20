@@ -2040,3 +2040,138 @@ body {
   letter-spacing: 3px;
   text-transform: uppercase;
 }
+
+/* ══════════════════════════════
+   GRAVEYARD & DECK ICONS
+══════════════════════════════ */
+.graveyard-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.graveyard-icon:hover {
+  border-color: rgba(255,80,80,0.4);
+  background: rgba(255,0,0,0.08);
+}
+
+.graveyard-count {
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+}
+
+.deck-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+}
+
+.deck-count-display {
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+}
+
+/* GRAVEYARD OVERLAY */
+.graveyard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+  animation: tooltip-in 0.2s ease-out;
+}
+
+.graveyard-panel {
+  width: 600px;
+  max-height: 70vh;
+  background: linear-gradient(160deg, #1a1228, #0d0d1a);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+
+.graveyard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.graveyard-title {
+  font-family: 'Passion One', sans-serif;
+  font-size: 20px;
+  color: #fcd34d;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.graveyard-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.graveyard-close:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+}
+
+.graveyard-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.graveyard-empty {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+  font-style: italic;
+  padding: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.graveyard-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.75;
+  filter: grayscale(0.3);
+  transition: all 0.2s;
+}
+
+.graveyard-card:hover {
+  opacity: 1;
+  filter: grayscale(0);
+  transform: translateY(-4px);
+}
