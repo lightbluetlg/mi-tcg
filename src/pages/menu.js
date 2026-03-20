@@ -1,7 +1,7 @@
 import { router as appRouter } from '../router.js'
 import { getAllDecks } from './deckbuilder.js'
 import { allCards } from '../cards.js'
-import { BASE } from '../main.js'
+import { BASE } from '../constants.js'
 
 const rarityFrames = {
   uncommon: 'RavenCard_Green_Frame.png',

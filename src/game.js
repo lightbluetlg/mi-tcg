@@ -53,6 +53,7 @@ export const gameState = {
   log: ['🎮 Game started! Your turn.'],
   _opponentGoesFirst: false,
   _skipOpponentManaIncrement: false,
+  _omenPending: null,
   player: {
     hp: 20,
     mana: 0,
@@ -109,12 +110,18 @@ export function playCard(uid) {
   }
   gameState.player.mana -= card.mana
   gameState.player.hand.splice(idx, 1)
-  card.canAttack = false
+  // Ambush: can attack immediately
+  card.canAttack = card.keywords?.includes('Ambush') ? true : false
   card.exhausted = false
   gameState.player.board.push(card)
   gameState.log.push(`▶️ You played ${card.name}.`)
   playSound('card_play')
   setTimeout(() => animateCardPlayed(card.uid), 50)
+
+  // Omen: look at top 3 cards, pick 1 to keep on top
+  if (card.keywords?.includes('Omen')) {
+    triggerOmen(gameState.player)
+  }
 }
 
 // ── ATTACK WITH A CARD
@@ -145,10 +152,53 @@ export async function attackWithCard(uid) {
     const selected = gameState.selectedCard
     const target = gameState.opponent.board.find(c => c.uid === uid)
     if (target) {
+      // Warden check: must attack a Warden if one exists
+      const wardens = gameState.opponent.board.filter(c => c.keywords?.includes('Warden'))
+      if (wardens.length > 0 && !target.keywords?.includes('Warden')) {
+        gameState.log.push(`🛡️ You must attack a Warden creature first!`)
+        gameState.selectedCard = null
+        return
+      }
       await resolveCombat(selected, target)
       gameState.selectedCard = null
     }
   }
+}
+
+// ── ATTACK HERO
+export function attackHero(attackerUid) {
+  if (gameState.turn !== 'player' || gameState.phase !== 'attack') return
+  const attacker = gameState.player.board.find(c => c.uid === attackerUid)
+  if (!attacker || !attacker.canAttack || attacker.exhausted) return
+
+  // Warden check: cannot attack hero while any Warden is on opponent board
+  const wardens = gameState.opponent.board.filter(c => c.keywords?.includes('Warden'))
+  if (wardens.length > 0) {
+    gameState.log.push(`🛡️ Can't attack the hero — a Warden is protecting them!`)
+    gameState.selectedCard = null
+    return
+  }
+
+  // Apex: double damage to heroes
+  const damage = attacker.keywords?.includes('Apex')
+    ? attacker.attack * 2
+    : attacker.attack
+
+  gameState.opponent.hp -= damage
+  attacker.exhausted = true
+  gameState.selectedCard = null
+  animateHeroHit('opponent')
+  playSound('attack')
+  gameState.log.push(`⚔️ ${attacker.name} attacked the enemy hero for ${damage}!${attacker.keywords?.includes('Apex') ? ' (Apex - double damage!)' : ''}`)
+
+  // Leech: heal your hero for damage dealt
+  if (attacker.keywords?.includes('Leech')) {
+    gameState.player.hp = Math.min(30, gameState.player.hp + damage)
+    gameState.log.push(`🩸 ${attacker.name} leeched ${damage} HP back to you!`)
+  }
+
+  checkWin()
+  import('./main.js').then(m => m.renderBoard())
 }
 
 // ── COMBAT RESOLUTION
@@ -175,6 +225,13 @@ async function resolveCombat(attacker, defender) {
 
   gameState.log.push(`⚔️ ${attacker.name} (${attacker.attack} atk) vs ${defender.name} (${defender.attack} atk)`)
 
+  // Leech: attacker heals its owner's hero for damage dealt
+  if (attacker.keywords?.includes('Leech')) {
+    const leecher = attacker.isOpponent ? gameState.opponent : gameState.player
+    leecher.hp = Math.min(30, leecher.hp + attacker.attack)
+    gameState.log.push(`🩸 ${attacker.name} leeched ${attacker.attack} HP!`)
+  }
+
   // Death animations
   const dyingUids = []
   if (attacker.currentHp <= 0) { dyingUids.push(attacker.uid); gameState.log.push(`💀 ${attacker.name} died.`) }
@@ -183,6 +240,37 @@ async function resolveCombat(attacker, defender) {
   if (dyingUids.length > 0) {
     playSound('death')
     await Promise.all(dyingUids.map(uid => animateCardDeath(uid)))
+  }
+
+  // Hollow: spawn a 1/1 Echo token for each dying Hollow creature
+  const allDying = [
+    ...gameState.player.board.filter(c => c.currentHp <= 0),
+    ...gameState.opponent.board.filter(c => c.currentHp <= 0),
+  ]
+  for (const dying of allDying) {
+    if (dying.keywords?.includes('Hollow')) {
+      const owner = dying.isOpponent ? gameState.opponent : gameState.player
+      if (owner.board.length < 7) {
+        const echo = {
+          uid: makeUID(),
+          id: 0,
+          name: `${dying.name} Echo`,
+          image: dying.image,
+          mana: 1,
+          attack: 1,
+          hp: 1,
+          currentHp: 1,
+          rarity: dying.rarity,
+          keywords: [],
+          lore: '',
+          canAttack: false,
+          exhausted: false,
+          isOpponent: dying.isOpponent,
+        }
+        owner.board.push(echo)
+        gameState.log.push(`👻 ${dying.name}'s Hollow summoned a 1/1 Echo token!`)
+      }
+    }
   }
 
   // Move dead creatures to graveyard
@@ -203,47 +291,35 @@ export function endTurn() {
 
 // ── AI HELPERS
 
-// Score a card by value (attack + hp relative to mana)
 function cardValue(card) {
   return card.attack + card.currentHp
 }
 
-// Find the best trade: attacker kills defender without dying
 function findBestTrade(attacker, targets) {
-  // First priority: kill target without dying
   const safekills = targets.filter(t =>
     attacker.attack >= t.currentHp && t.attack < attacker.currentHp
   )
   if (safekills.length > 0) {
-    // Among safe kills, pick highest value target
     return safekills.reduce((best, t) => cardValue(t) > cardValue(best) ? t : best)
   }
-
-  // Second priority: kill target even if we die (trade if target is worth more)
   const trades = targets.filter(t =>
     attacker.attack >= t.currentHp && cardValue(t) >= cardValue(attacker)
   )
   if (trades.length > 0) {
     return trades.reduce((best, t) => cardValue(t) > cardValue(best) ? t : best)
   }
-
-  // Third priority: damage highest HP target to set up future kills
   return targets.reduce((best, t) => cardValue(t) > cardValue(best) ? t : best)
 }
 
-// Can we lethal the player this turn?
 function canLethal(attackers) {
   const totalDamage = attackers.reduce((sum, a) => sum + a.attack, 0)
   return totalDamage >= gameState.player.hp
 }
 
-// Pick the best cards to play given remaining mana
 function pickCardsToPlay(hand, mana) {
-  // Sort by value descending (best card first)
   const sorted = [...hand].sort((a, b) => cardValue(b) - cardValue(a))
   const toPlay = []
   let remaining = mana
-
   for (const card of sorted) {
     if (card.mana <= remaining) {
       toPlay.push(card)
@@ -257,7 +333,6 @@ function pickCardsToPlay(hand, mana) {
 async function opponentTurn() {
   const opp = gameState.opponent
 
-  // Gain mana
   if (gameState._skipOpponentManaIncrement) {
     gameState._skipOpponentManaIncrement = false
   } else {
@@ -265,12 +340,9 @@ async function opponentTurn() {
     opp.mana = opp.maxMana
   }
 
-  // Step 1 — mark existing creatures as able to attack
   opp.board.forEach(c => { c.canAttack = true; c.exhausted = false })
   const existingAttackerUids = opp.board.map(c => c.uid)
 
-  // Step 2 — smart card playing
-  // Pick best combination of cards to play with available mana
   const cardsToPlay = pickCardsToPlay(opp.hand, opp.mana)
   for (const card of cardsToPlay) {
     const idx = opp.hand.findIndex(c => c.uid === card.uid)
@@ -278,7 +350,7 @@ async function opponentTurn() {
     if (card.mana > opp.mana) continue
     opp.hand.splice(idx, 1)
     opp.mana -= card.mana
-    card.canAttack = false
+    card.canAttack = card.keywords?.includes('Ambush') ? true : false
     card.exhausted = false
     gameState.log.push(`🤖 Opponent played ${card.name}.`)
     playSound('card_play')
@@ -288,68 +360,69 @@ async function opponentTurn() {
     await new Promise(r => setTimeout(r, 300))
   }
 
-  // Step 3 — smart attacking
   const playerBoard = gameState.player.board
-
-  // Check if we can win this turn (lethal check)
   const availableAttackers = existingAttackerUids
     .map(uid => opp.board.find(c => c.uid === uid))
     .filter(c => c && c.currentHp > 0 && !c.exhausted)
 
+  // AI respects player's Warden creatures
+  const playerWardens = gameState.player.board.filter(c => c.keywords?.includes('Warden'))
+
   if (playerBoard.length === 0 && canLethal(availableAttackers)) {
-    // Go face for lethal
     for (const attacker of availableAttackers) {
       if (attacker.currentHp <= 0 || attacker.exhausted) continue
-      gameState.player.hp -= attacker.attack
+      const damage = attacker.keywords?.includes('Apex') ? attacker.attack * 2 : attacker.attack
+      gameState.player.hp -= damage
       attacker.exhausted = true
       animateHeroHit('player')
       playSound('attack')
-      gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${attacker.attack}! (LETHAL)`)
+      gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${damage}! (LETHAL)`)
       checkWin()
       if (gameState.gameOver) break
     }
   } else {
-    // Smart trading and face damage
     for (const uid of existingAttackerUids) {
       const attacker = opp.board.find(c => c.uid === uid)
       if (!attacker || attacker.currentHp <= 0 || attacker.exhausted) continue
 
       const currentPlayerBoard = gameState.player.board
+      const currentWardens = currentPlayerBoard.filter(c => c.keywords?.includes('Warden'))
 
       if (currentPlayerBoard.length > 0) {
-        // Find best trade
-        const target = findBestTrade(attacker, currentPlayerBoard)
+        // Must target a Warden if one exists
+        const targets = currentWardens.length > 0 ? currentWardens : currentPlayerBoard
+        const target = findBestTrade(attacker, targets)
         await resolveCombat(attacker, target)
       } else {
         // No creatures — go face
-        gameState.player.hp -= attacker.attack
+        const damage = attacker.keywords?.includes('Apex') ? attacker.attack * 2 : attacker.attack
+        gameState.player.hp -= damage
         attacker.exhausted = true
         animateHeroHit('player')
         playSound('attack')
-        gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${attacker.attack}!`)
+        gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${damage}!`)
         checkWin()
       }
 
       if (gameState.gameOver) break
     }
 
-    // After clearing board, any remaining attackers go face
     for (const uid of existingAttackerUids) {
       const attacker = opp.board.find(c => c.uid === uid)
       if (!attacker || attacker.currentHp <= 0 || attacker.exhausted) continue
       if (gameState.player.board.length === 0) {
-        gameState.player.hp -= attacker.attack
+        const damage = attacker.keywords?.includes('Apex') ? attacker.attack * 2 : attacker.attack
+        gameState.player.hp -= damage
         attacker.exhausted = true
         animateHeroHit('player')
         playSound('attack')
-        gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${attacker.attack}!`)
+        gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${damage}!`)
         checkWin()
         if (gameState.gameOver) break
       }
     }
   }
 
-  // Draw a card (opponent) — fatigue if empty
   if (opp.deck.length > 0) {
     opp.hand.push(opp.deck.shift())
   } else {
@@ -359,7 +432,6 @@ async function opponentTurn() {
     checkWin()
   }
 
-  // Start player turn
   gameState.turn = 'player'
   gameState.phase = 'play'
   gameState.turnNumber++
@@ -368,7 +440,6 @@ async function opponentTurn() {
   gameState.player.mana = gameState.player.maxMana
   gameState.player.board.forEach(c => { c.canAttack = true; c.exhausted = false })
 
-  // Draw a card (player) — fatigue if empty
   if (gameState.player.deck.length > 0) {
     gameState.player.hand.push(gameState.player.deck.shift())
   } else {
@@ -414,6 +485,7 @@ export function freshGame(slot = 1) {
     log: [],
     _opponentGoesFirst: false,
     _skipOpponentManaIncrement: false,
+    _omenPending: null,
     player: { hp: 20, mana: 0, maxMana: 0, hand: pd.slice(0, 5), deck: pd.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
     opponent: { hp: 20, mana: 0, maxMana: 0, hand: od.slice(0, 5), deck: od.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
   }
@@ -430,6 +502,28 @@ export function freshGame(slot = 1) {
     fresh.player.maxMana = 1
   }
   return fresh
+}
+
+// ── OMEN
+export function triggerOmen(playerState) {
+  const deck = playerState.deck
+  if (deck.length === 0) return
+  const revealed = deck.splice(0, Math.min(3, deck.length))
+  gameState._omenPending = { owner: playerState, cards: revealed }
+  import('./main.js').then(m => m.showOmenModal(revealed))
+}
+
+export function resolveOmen(chosenUid) {
+  const pending = gameState._omenPending
+  if (!pending) return
+  const { owner, cards } = pending
+  const chosen = cards.find(c => c.uid === chosenUid)
+  const rest = cards.filter(c => c.uid !== chosenUid)
+  owner.deck.unshift(chosen)
+  owner.deck.push(...rest)
+  gameState._omenPending = null
+  gameState.log.push(`🔮 Omen resolved — card placed on top of your deck.`)
+  import('./main.js').then(m => m.renderBoard())
 }
 
 export function triggerOpponentFirst() {

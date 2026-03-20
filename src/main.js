@@ -3,7 +3,7 @@ import { router } from './router.js'
 import { renderMenu } from './pages/menu.js'
 import { renderDeckBuilder, getSavedDeck, getAllDecks } from './pages/deckbuilder.js'
 import { renderPreMatch } from './pages/prematch.js'
-import { gameState, playCard, attackWithCard, endTurn, checkWin } from './game.js'
+import { gameState, playCard, attackWithCard, attackHero, endTurn, checkWin, resolveOmen } from './game.js'
 import { allCards } from './cards.js'
 import { playSound, toggleMute, isMuted } from './audio.js'
 export const BASE = '/mi-tcg/'
@@ -431,14 +431,7 @@ function attachEvents() {
   // Attack opponent hero
   document.getElementById('opponent-hero')?.addEventListener('click', () => {
     if (gameState.selectedCard && gameState.phase === 'attack' && gameState.turn === 'player') {
-      const attacker = gameState.selectedCard
-      gameState.opponent.hp -= attacker.attack
-      attacker.exhausted = true
-      animateHeroHit('opponent')
-      playSound('attack')
-      gameState.log.push(`⚔️ ${attacker.name} struck the opponent hero for ${attacker.attack} damage!`)
-      gameState.selectedCard = null
-      checkWin()
+      attackHero(gameState.selectedCard.uid)
       renderBoard()
     }
   })
@@ -473,6 +466,92 @@ function attachEvents() {
   document.getElementById('btn-menu')?.addEventListener('click', () => {
     removeTooltip()
     router.go('menu')
+  })
+}
+
+// ── OMEN MODAL
+export function showOmenModal(cards) {
+  // Remove any existing modal
+  document.getElementById('omen-modal')?.remove()
+
+  const modal = document.createElement('div')
+  modal.id = 'omen-modal'
+  modal.style.cssText = `
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.75);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px;
+  `
+
+  modal.innerHTML = `
+    <div style="
+      font-family: 'Passion One', sans-serif;
+      font-size: 22px; color: #c9a84c;
+      text-transform: uppercase; letter-spacing: 2px;
+      text-shadow: 0 0 12px rgba(201,168,76,0.6);
+    ">🔮 Omen — Choose a card to keep on top</div>
+    <div style="font-family: Barlow, sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); margin-top: -12px;">
+      The other cards go to the bottom of your deck.
+    </div>
+    <div id="omen-choices" style="display: flex; gap: 20px; align-items: center;">
+      ${cards.map(card => `
+        <div class="omen-card-choice card rarity-${card.rarity}" data-uid="${card.uid}" style="
+          cursor: pointer; position: relative;
+          width: 100px; height: 140px;
+          border-radius: 10px; overflow: hidden;
+          transition: transform 0.2s, box-shadow 0.2s;
+          box-shadow: 0 0 0px rgba(201,168,76,0);
+        ">
+          <div style="position:absolute;inset:0;z-index:1;">
+            <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
+          </div>
+          <div style="position:absolute;inset:0;z-index:2;">
+            <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
+          </div>
+          <div style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
+            background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a5fa0,#0a2040);
+            border:1px solid #90cdf4;display:flex;align-items:center;justify-content:center;
+            font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#fff;z-index:10;">
+            ${card.mana}
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;z-index:10;
+            background:linear-gradient(transparent,rgba(0,0,0,0.85));
+            padding:4px 4px 5px;text-align:center;">
+            <div style="font-family:'Passion One',sans-serif;font-size:9px;color:#f0d080;
+              text-transform:uppercase;letter-spacing:0.5px;
+              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${card.name}
+            </div>
+            <div style="font-family:Barlow,sans-serif;font-size:9px;color:rgba(255,255,255,0.5);">
+              ⚔️${card.attack} 🩸${card.hp}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="font-family:Barlow,sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">
+      Click a card to place it on top of your deck
+    </div>
+  `
+
+  document.body.appendChild(modal)
+
+  // Hover glow effect
+  modal.querySelectorAll('.omen-card-choice').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      el.style.transform = 'scale(1.08) translateY(-4px)'
+      el.style.boxShadow = '0 0 20px rgba(201,168,76,0.7)'
+    })
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = ''
+      el.style.boxShadow = '0 0 0px rgba(201,168,76,0)'
+    })
+    el.addEventListener('click', () => {
+      const uid = parseInt(el.dataset.uid)
+      resolveOmen(uid)
+      modal.remove()
+    })
   })
 }
 
