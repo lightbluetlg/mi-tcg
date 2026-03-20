@@ -14,8 +14,9 @@ function shuffle(arr) {
 }
 
 function buildDeck() {
-  const pool = [...allCards, ...allCards, ...allCards, ...allCards]
-  return shuffle(pool).slice(0, 20).map(card => ({
+  const saved = localStorage.getItem('ravenclash_deck_1')
+  const base = saved ? JSON.parse(saved) : [...allCards, ...allCards].slice(0, 20)
+  return shuffle([...base]).map(card => ({
     ...card,
     uid: makeUID(),
     currentHp: card.hp,
@@ -239,11 +240,6 @@ export function checkWin() {
     gameState.winner = 'opponent'
     gameState.log.push('💀 You lost!')
   }
-}
-
-// Trigger opponent first turn if they won the coin flip
-if (gameState._opponentGoesFirst) {
-  setTimeout(() => { opponentTurn() }, 1200)
 }
 
 export function freshGame() {
