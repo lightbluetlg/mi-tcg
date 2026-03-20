@@ -112,7 +112,10 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="topbar-profile">
           <div class="topbar-avatar">⚔️</div>
           <div class="topbar-info">
-            <input class="topbar-name-input" id="topbar-name" value="${n}" maxlength="20" />
+            <div class="topbar-name-wrapper">
+              <input class="topbar-name-input" id="topbar-name" value="${n}" maxlength="20" />
+              <span class="topbar-name-pencil">✏️</span>
+            </div>
             <div class="topbar-stats">${t.length} deck${t.length===1?``:`s`} ready</div>
           </div>
         </div>
