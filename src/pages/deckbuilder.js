@@ -1,5 +1,6 @@
 import { router } from '../router.js'
 import { allCards } from '../cards.js'
+import { BASE } from '../main.js'
 
 const MAX_COPIES = 2
 const DECK_SIZE = 20
@@ -85,9 +86,9 @@ function renderCardThumb(card) {
   return `
     <div class="thumb-card ${maxed && !pickingCover ? 'maxed' : ''} ${isCover ? 'is-cover' : ''} rarity-${card.rarity}" data-id="${card.id}">
       <div class="thumb-image">
-        <img src="/cards/${card.image}" alt="${card.name}" />
+        <img src="${BASE}cards/${card.image}" alt="${card.name}" />
         <div class="thumb-frame">
-          <img src="/${rarityFrames[card.rarity]}" alt="" />
+          <img src="${BASE}${rarityFrames[card.rarity]}" alt="" />
         </div>
         <div class="thumb-mana">${card.mana}</div>
         ${isCover ? '<div class="cover-badge">✦</div>' : ''}
@@ -137,7 +138,7 @@ export function renderDeckBuilder(slot = currentSlot) {
               const d = getSavedDeck(s)
               const ready = d && d.cards && d.cards.length === DECK_SIZE
               return `<button class="deck-slot-btn ${s === currentSlot ? 'active' : ''} ${ready ? 'ready' : ''}" data-slot="${s}">
-                ${d && d.coverId ? `<img src="/cards/${allCards.find(c => c.id === d.coverId)?.image}" class="slot-cover" />` : ''}
+                ${d && d.coverId ? `<img src="${BASE}cards/${allCards.find(c => c.id === d.coverId)?.image}" class="slot-cover" />` : ''}
                 <span class="slot-label">${d && d.name ? d.name : `Deck ${s}`}</span>
                 ${ready ? '<span class="slot-ready">✓</span>' : ''}
               </button>`
@@ -187,9 +188,9 @@ export function renderDeckBuilder(slot = currentSlot) {
           ${coverCard ? `
             <div class="deck-cover-preview">
               <div class="thumb-image" style="width:70px;height:95px;position:relative;border-radius:6px;overflow:hidden;">
-                <img src="/cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
+                <img src="${BASE}cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
                 <div class="thumb-frame" style="position:absolute;inset:0;">
-                  <img src="/${rarityFrames[coverCard.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
+                  <img src="${BASE}${rarityFrames[coverCard.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
                 </div>
               </div>
               <span class="cover-card-name">${coverCard.name}</span>

@@ -1,6 +1,7 @@
 import { router } from '../router.js'
 import { getAllDecks } from './deckbuilder.js'
 import { allCards } from '../cards.js'
+import { BASE } from '../main.js'
 
 const rarityFrames = {
   uncommon: 'RavenCard_Green_Frame.png',
@@ -30,9 +31,9 @@ export function renderPreMatch() {
                 <div class="prematch-deck-art">
                   ${coverCard ? `
                     <div style="position:relative;width:100%;height:100%;">
-                      <img src="/cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
+                      <img src="${BASE}cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
                       <div style="position:absolute;inset:0;">
-                        <img src="/${frame}" style="width:100%;height:100%;object-fit:fill;" />
+                        <img src="${BASE}${frame}" style="width:100%;height:100%;object-fit:fill;" />
                       </div>
                     </div>
                   ` : '<div class="prematch-no-art">?</div>'}

@@ -105,7 +105,7 @@ export function renderMenu() {
                       ${coverCard ? `
                         <img src="${BASE}cards/${coverCard.image}" style="width:100%;height:100%;object-fit:cover;" />
                         <div style="position:absolute;inset:0;">
-                          <img src="/${frame}" style="width:100%;height:100%;object-fit:fill;" />
+                          <img src="${BASE}${frame}" style="width:100%;height:100%;object-fit:fill;" />
                         </div>
                       ` : '<div class="center-deck-empty-art">?</div>'}
                       ${isSelected ? '<div class="deck-selected-overlay">✓</div>' : ''}
