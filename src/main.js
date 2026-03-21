@@ -3,7 +3,7 @@ import { router } from './router.js'
 import { renderMenu } from './pages/menu.js'
 import { renderDeckBuilder, getSavedDeck, getAllDecks } from './pages/deckbuilder.js'
 import { renderPreMatch } from './pages/prematch.js'
-import { gameState, playCard, attackWithCard, attackHero, endTurn, checkWin, resolveOmen } from './game.js'
+import { gameState, playCard, attackWithCard, attackHero, endTurn, checkWin, resolveOmen, useHeroAbility, resolveAbilityTarget } from './game.js'
 import { allCards } from './cards.js'
 import { playSound, toggleMute, isMuted } from './audio.js'
 export const BASE = '/mi-tcg/'
@@ -70,7 +70,7 @@ export function renderBoard() {
         </div>
         <div class="battlefield opponent-field" id="opponent-field">
           ${gs.opponent.board.map(c => renderCard(c, 'board')).join('')}
-          ${gs.opponent.board.length === 0 ? '<div class="empty-field-hint">Opponent\'s field</div>' : ''}
+          ${gs.opponent.board.length === 0 ? '' : ''}
         </div>
         <div class="hero-info">
           <div class="hero-portrait opponent-portrait ${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? 'attackable-hero' : ''}" id="opponent-hero">
@@ -111,13 +111,22 @@ export function renderBoard() {
         </div>
         <div class="battlefield player-field" id="player-field">
           ${gs.player.board.map(c => renderCard(c, 'board')).join('')}
-          ${gs.player.board.length === 0 ? '<div class="empty-field-hint">Your field — play cards here</div>' : ''}
+          ${gs.player.board.length === 0 ? '' : ''}
         </div>
         <div class="hero-info">
-          <div class="hero-portrait player-portrait">
-            <div class="hero-name">You</div>
+          <div class="hero-portrait player-portrait" style="${gs.hero ? `border-color: ${gs.hero.borderColor}; box-shadow: 0 0 12px ${gs.hero.glowColor};` : ''}">
+            <div class="hero-name" style="${gs.hero ? `color: ${gs.hero.borderColor};` : ''}">${gs.hero ? gs.hero.name.split(' ')[0] : 'You'}</div>
             <div class="hero-hp"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.player.hp}</div>
           </div>
+          ${gs.hero && gs.turn === 'player' ? `
+            <button class="btn-hero-ability ${gs.heroAbilityUsed ? 'used' : ''} ${gs._abilityTargeting ? 'targeting' : ''}"
+              id="btn-hero-ability"
+              ${gs.heroAbilityUsed ? 'disabled' : ''}
+              style="--hero-color: ${gs.hero.borderColor}; --hero-glow: ${gs.hero.glowColor};">
+              <span class="ability-name">${gs.hero.abilityName}</span>
+              <span class="ability-cost">${gs.hero.abilityCost} mana</span>
+            </button>
+          ` : ''}
           <div class="mana-display">
             <span class="mana-label">MANA</span>
             <span class="mana-value">${gs.player.mana}/${gs.player.maxMana}</span>
@@ -428,10 +437,14 @@ function attachEvents() {
     })
   })
 
-  // Attack with board card
+  // Attack with board card (or resolve ability target)
   document.querySelectorAll('.card[data-context="board"]').forEach(el => {
     el.addEventListener('click', async () => {
       const uid = parseInt(el.dataset.uid)
+      if (gameState._abilityTargeting) {
+        resolveAbilityTarget(uid)
+        return
+      }
       await attackWithCard(uid)
       renderBoard()
     })
@@ -476,6 +489,10 @@ function attachEvents() {
     removeTooltip()
     router.go('menu')
   })
+
+  document.getElementById('btn-hero-ability')?.addEventListener('click', () => {
+    useHeroAbility()
+  })
 }
 
 // ── OMEN MODAL
@@ -518,11 +535,9 @@ export function showOmenModal(cards) {
           <div style="position:absolute;inset:0;z-index:2;">
             <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
           </div>
-          <div style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
-            background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a5fa0,#0a2040);
-            border:1px solid #90cdf4;display:flex;align-items:center;justify-content:center;
-            font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#fff;z-index:10;">
-            ${card.mana}
+          <div style="position:absolute;top:3px;left:3px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;z-index:10;">
+            <img src="${BASE}pngicons/mana.png" style="position:absolute;width:32px;height:32px;object-fit:contain;" />
+            <span style="position:relative;z-index:2;font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#fff;text-shadow:0 0 6px rgba(0,0,0,1),0 0 12px rgba(0,0,0,1);margin-top:4px;">${card.mana}</span>
           </div>
           <div style="position:absolute;bottom:0;left:0;right:0;z-index:10;
             background:linear-gradient(transparent,rgba(0,0,0,0.85));
@@ -532,8 +547,15 @@ export function showOmenModal(cards) {
               white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
               ${card.name}
             </div>
-            <div style="font-family:Barlow,sans-serif;font-size:9px;color:rgba(255,255,255,0.5);">
-              ⚔️${card.attack} 🩸${card.hp}
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px;">
+              <div style="display:flex;align-items:center;gap:2px;background:rgba(0,0,0,0.85);border:1px solid rgba(180,40,40,0.6);border-radius:4px;padding:2px 5px;">
+                <img src="${BASE}pngicons/crossed_swords.png" style="width:10px;height:10px;" />
+                <span style="font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#ff7070;text-shadow:0 0 6px rgba(0,0,0,1),0 2px 4px rgba(0,0,0,1);">${card.attack}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:2px;background:rgba(0,0,0,0.85);border:1px solid rgba(180,20,40,0.6);border-radius:4px;padding:2px 5px;">
+                <img src="${BASE}pngicons/heart.png" style="width:10px;height:10px;" />
+                <span style="font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#ff4466;text-shadow:0 0 6px rgba(0,0,0,1),0 2px 4px rgba(0,0,0,1);">${card.hp}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -569,10 +591,10 @@ router.onChange((page, params) => {
   removeTooltip()
   if (page === 'menu') renderMenu()
   if (page === 'deckbuilder') renderDeckBuilder()
-  if (page === 'prematch') renderPreMatch()
+  if (page === 'prematch') renderPreMatch(params)
   if (page === 'game') {
     import('./game.js').then(m => {
-      const fresh = m.freshGame(params?.slot)
+      const fresh = m.freshGame(params?.slot, params?.heroId)
       Object.assign(gameState, fresh)
       renderBoard()
       if (fresh._opponentGoesFirst) {

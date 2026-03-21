@@ -1,5 +1,6 @@
 import { animateCardHit, animateCardDeath, animateCardLunge, animateHeroHit, animateCardPlayed, animateCardPlayedFromHand, floatDamage } from './main.js'
 import { allCards } from './cards.js'
+import { allHeroes } from './heroes.js'
 import { playSound } from './audio.js'
 
 // ── HELPERS
@@ -54,6 +55,9 @@ export const gameState = {
   _opponentGoesFirst: false,
   _skipOpponentManaIncrement: false,
   _omenPending: null,
+  _abilityTargeting: false,
+  hero: null,
+  heroAbilityUsed: false,
   player: {
     hp: 20,
     mana: 0,
@@ -110,8 +114,28 @@ export function playCard(uid) {
   }
   gameState.player.mana -= card.mana
   gameState.player.hand.splice(idx, 1)
+
   // Ambush: can attack immediately
-  card.canAttack = card.keywords?.includes('Ambush') ? true : false
+  let hasAmbush = card.keywords?.includes('Ambush')
+
+  // Hero passives on play
+  const hero = gameState.hero
+  if (hero) {
+    if (hero.id === 'skorn' && card.keywords?.includes('Warden')) {
+      card.hp += 1
+      card.currentHp += 1
+      gameState.log.push(`🖤 Lord Skorn's passive: ${card.name} gains +1 HP!`)
+    }
+    if (hero.id === 'djinn' && card.keywords?.includes('Ambush')) {
+      card.attack += 1
+      gameState.log.push(`✨ Djinn Colossus passive: ${card.name} gains +1 Attack!`)
+    }
+    if (hero.id === 'djinn' && !hasAmbush) {
+      // Unleash effect carries over if active
+    }
+  }
+
+  card.canAttack = hasAmbush ? true : false
   card.exhausted = false
   gameState.player.board.push(card)
   gameState.log.push(`▶️ You played ${card.name}.`)
@@ -282,8 +306,16 @@ async function resolveCombat(attacker, defender) {
 
 // ── END TURN
 export function endTurn() {
+  // Clean up temp Unleash keywords
+  gameState.player.board.forEach(c => {
+    if (c._unleashTemp) {
+      c.keywords = c.keywords.filter(k => k !== 'Ambush')
+      c._unleashTemp = false
+    }
+  })
   gameState.phase = 'play'
   gameState.selectedCard = null
+  gameState._abilityTargeting = null
   gameState.turn = 'opponent'
   gameState.log.push(`⏭️ You ended your turn.`)
   setTimeout(() => { opponentTurn() }, 800)
@@ -435,6 +467,7 @@ async function opponentTurn() {
   gameState.turn = 'player'
   gameState.phase = 'play'
   gameState.turnNumber++
+  gameState.heroAbilityUsed = false
 
   gameState.player.maxMana = Math.min(10, gameState.player.maxMana + 1)
   gameState.player.mana = gameState.player.maxMana
@@ -472,9 +505,14 @@ export function checkWin() {
   }
 }
 
-export function freshGame(slot = 1) {
+export function freshGame(slot = 1, heroId = null) {
   const pd = buildDeck(slot)
   const od = buildOpponentDeck()
+  const hero = heroId ? allHeroes.find(h => h.id === heroId) || null : null
+
+  // Igneas passive: opponent starts with 1 less mana on turn 1
+  const igneasActive = hero?.id === 'igneas'
+
   const fresh = {
     turn: 'player',
     phase: 'play',
@@ -482,26 +520,134 @@ export function freshGame(slot = 1) {
     selectedCard: null,
     gameOver: false,
     winner: null,
-    log: [],
+    log: hero ? [`⚔️ ${hero.name} enters the battle!`] : [],
     _opponentGoesFirst: false,
     _skipOpponentManaIncrement: false,
     _omenPending: null,
+    _abilityTargeting: null,
+    hero,
+    heroAbilityUsed: false,
     player: { hp: 20, mana: 0, maxMana: 0, hand: pd.slice(0, 5), deck: pd.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
     opponent: { hp: 20, mana: 0, maxMana: 0, hand: od.slice(0, 5), deck: od.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
   }
+
   if (Math.random() < 0.5) {
     fresh.turn = 'opponent'
-    fresh.log = ['🎲 Opponent goes first!']
+    fresh.log.push('🎲 Opponent goes first!')
     fresh._opponentGoesFirst = true
     fresh._skipOpponentManaIncrement = true
-    fresh.opponent.mana = 1
-    fresh.opponent.maxMana = 1
+    fresh.opponent.mana = igneasActive ? 0 : 1
+    fresh.opponent.maxMana = igneasActive ? 0 : 1
   } else {
-    fresh.log = ['🎲 You go first!']
+    fresh.log.push('🎲 You go first!')
     fresh.player.mana = 1
     fresh.player.maxMana = 1
+    if (igneasActive) {
+      fresh.opponent.mana = 0
+      fresh.opponent.maxMana = 0
+      fresh.log.push(`🔵 Igneas passive: Opponent starts with 0 mana!`)
+    }
   }
+
+  // Serafine passive: draw 1 extra card on first turn
+  if (hero?.id === 'serafine' && fresh.turn === 'player') {
+    if (fresh.player.deck.length > 0) {
+      fresh.player.hand.push(fresh.player.deck.shift())
+      fresh.log.push(`💜 Serafine's passive: You draw an extra card!`)
+    }
+  }
+
   return fresh
+}
+
+// ── HERO ABILITY
+export function useHeroAbility() {
+  const hero = gameState.hero
+  if (!hero) return
+  if (gameState.heroAbilityUsed) {
+    gameState.log.push(`❌ Hero ability already used this turn.`)
+    import('./main.js').then(m => m.renderBoard())
+    return
+  }
+  if (gameState.player.mana < hero.abilityCost) {
+    gameState.log.push(`❌ Not enough mana for ${hero.abilityName}.`)
+    import('./main.js').then(m => m.renderBoard())
+    return
+  }
+  if (gameState.turn !== 'player') return
+
+  const effect = hero.abilityEffect
+
+  // Non-targeting abilities
+  if (effect === 'foresight') {
+    gameState.player.mana -= hero.abilityCost
+    gameState.heroAbilityUsed = true
+    gameState.log.push(`🔮 Serafine's Foresight activated!`)
+    triggerOmen(gameState.player)
+    import('./main.js').then(m => m.renderBoard())
+    return
+  }
+
+  // Targeting abilities — set targeting mode
+  gameState._abilityTargeting = effect
+  gameState.player.mana -= hero.abilityCost
+  gameState.heroAbilityUsed = true
+
+  if (effect === 'fortify') {
+    gameState.log.push(`🛡️ Fortify: Click a friendly creature to give it +2 HP.`)
+  } else if (effect === 'bloodprice') {
+    gameState.log.push(`🩸 Blood Price: Click any creature to deal 3 damage to it.`)
+  } else if (effect === 'unleash') {
+    gameState.log.push(`⚡ Unleash: Click a friendly creature to give it Ambush.`)
+  } else if (effect === 'glacialgrasp') {
+    gameState.log.push(`❄️ Glacial Grasp: Click an enemy creature to exhaust it.`)
+  }
+
+  import('./main.js').then(m => m.renderBoard())
+}
+
+export function resolveAbilityTarget(uid) {
+  const effect = gameState._abilityTargeting
+  if (!effect) return false
+
+  const playerCard = gameState.player.board.find(c => c.uid === uid)
+  const opponentCard = gameState.opponent.board.find(c => c.uid === uid)
+
+  if (effect === 'fortify') {
+    if (!playerCard) return false
+    playerCard.hp += 2
+    playerCard.currentHp += 2
+    gameState.log.push(`🛡️ ${playerCard.name} gains +2 HP from Fortify!`)
+  } else if (effect === 'bloodprice') {
+    const target = playerCard || opponentCard
+    if (!target) return false
+    target.currentHp -= 3
+    gameState.player.hp -= 1
+    gameState.log.push(`🩸 Blood Price deals 3 damage to ${target.name}! You lose 1 HP.`)
+    // Remove dead creatures
+    gameState.player.board.forEach(c => { if (c.currentHp <= 0) gameState.player.graveyard.push({...c}) })
+    gameState.opponent.board.forEach(c => { if (c.currentHp <= 0) gameState.opponent.graveyard.push({...c}) })
+    gameState.player.board = gameState.player.board.filter(c => c.currentHp > 0)
+    gameState.opponent.board = gameState.opponent.board.filter(c => c.currentHp > 0)
+    checkWin()
+  } else if (effect === 'unleash') {
+    if (!playerCard) return false
+    if (!playerCard.keywords) playerCard.keywords = []
+    playerCard.keywords.push('Ambush')
+    playerCard.canAttack = true
+    playerCard._unleashTemp = true
+    gameState.log.push(`⚡ ${playerCard.name} gains Ambush from Unleash!`)
+  } else if (effect === 'glacialgrasp') {
+    if (!opponentCard) return false
+    opponentCard.exhausted = true
+    opponentCard.canAttack = false
+    opponentCard._frosted = true
+    gameState.log.push(`❄️ ${opponentCard.name} is frozen by Glacial Grasp!`)
+  }
+
+  gameState._abilityTargeting = null
+  import('./main.js').then(m => m.renderBoard())
+  return true
 }
 
 // ── OMEN

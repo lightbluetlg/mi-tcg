@@ -170,7 +170,7 @@ function attachMenuEvents(decks, canPlay) {
   // Play button
   document.getElementById('btn-play')?.addEventListener('click', () => {
     if (!canPlay) return
-    appRouter.go('game', { slot: selectedSlot })
+    appRouter.go('prematch', { slot: selectedSlot })
   })
 
   // Collection / deck builder
