@@ -23,6 +23,10 @@ body {
   flex-direction: column;
   justify-content: space-between;
   padding: 8px 16px;
+  background-image: linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.20)), url('/mi-tcg/Background.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 /* ══════════════════════════════
@@ -136,19 +140,20 @@ body {
   align-items: center;
   gap: 12px;
   min-height: 120px;
-  background: rgba(255,255,255,0.02);
+  background: rgba(0,0,0,0.4);
   border: 1px dashed rgba(201,168,76,0.2);
   border-radius: 10px;
   padding: 8px;
 }
 
 .empty-field-hint {
-  color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.45);
   font-family: 'Poppins', sans-serif;
   font-size: 11px;
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: 2px;
   text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
 }
 
 /* ══════════════════════════════
@@ -166,11 +171,12 @@ body {
    CARD BACK
 ══════════════════════════════ */
 .card-back {
-  width: 60px;
-  height: 84px;
+  width: 80px;
+  height: 112px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #1a0a2e, #2d1b4e);
-  border: 1px solid #4a3070;
+  background-image: url('/mi-tcg/Cardback.webp');
+  background-size: cover;
+  background-position: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
