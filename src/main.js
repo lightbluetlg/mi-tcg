@@ -73,8 +73,11 @@ export function renderBoard() {
           ${gs.opponent.board.length === 0 ? '' : ''}
         </div>
         <div class="hero-info">
-          <div class="hero-portrait opponent-portrait ${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? 'attackable-hero' : ''}" id="opponent-hero">
-            <div class="hero-name">${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? '⚔️ Attack!' : 'Opponent'}</div>
+          <div class="hero-portrait opponent-portrait ${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? 'attackable-hero' : ''}" id="opponent-hero"
+            style="${gs.oppHero ? `border-color: ${gs.oppHero.borderColor}; box-shadow: 0 0 12px ${gs.oppHero.glowColor};` : ''}">
+            <div class="hero-name" style="${gs.oppHero ? `color: ${gs.oppHero.borderColor};` : ''}">
+              ${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? 'Attack!' : gs.oppHero ? gs.oppHero.name : 'Opponent'}
+            </div>
             <div class="hero-hp"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.opponent.hp}</div>
           </div>
           <div class="mana-display">
@@ -115,7 +118,7 @@ export function renderBoard() {
         </div>
         <div class="hero-info">
           <div class="hero-portrait player-portrait" style="${gs.hero ? `border-color: ${gs.hero.borderColor}; box-shadow: 0 0 12px ${gs.hero.glowColor};` : ''}">
-            <div class="hero-name" style="${gs.hero ? `color: ${gs.hero.borderColor};` : ''}">${gs.hero ? gs.hero.name.split(' ')[0] : 'You'}</div>
+            <div class="hero-name" style="${gs.hero ? `color: ${gs.hero.borderColor};` : ''}">${gs.hero ? gs.hero.name : 'You'}</div>
             <div class="hero-hp"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.player.hp}</div>
           </div>
           ${gs.hero && gs.turn === 'player' ? `

@@ -373,6 +373,7 @@ async function opponentTurn() {
   }
 
   opp.board.forEach(c => { c.canAttack = true; c.exhausted = false })
+  gameState.oppHeroAbilityUsed = false
   const existingAttackerUids = opp.board.map(c => c.uid)
 
   const cardsToPlay = pickCardsToPlay(opp.hand, opp.mana)
@@ -390,6 +391,64 @@ async function opponentTurn() {
     opp.board.push(card)
     import('./main.js').then(m => m.renderBoard())
     await new Promise(r => setTimeout(r, 300))
+  }
+
+  // AI hero ability usage
+  const oppHero = gameState.oppHero
+  if (oppHero && !gameState.oppHeroAbilityUsed && opp.mana >= oppHero.abilityCost) {
+    const roll = Math.random()
+    if (roll < 0.65) { // 65% chance to use ability each turn if affordable
+      opp.mana -= oppHero.abilityCost
+      gameState.oppHeroAbilityUsed = true
+      const effect = oppHero.abilityEffect
+
+      if (effect === 'fortify' && opp.board.length > 0) {
+        const target = opp.board.reduce((best, c) => c.currentHp > best.currentHp ? c : best)
+        target.hp += 2
+        target.currentHp += 2
+        gameState.log.push(`🤖 ${oppHero.name} uses Fortify on ${target.name}! (+2 HP)`)
+      } else if (effect === 'foresight') {
+        // AI just draws top card essentially — peek and keep best
+        const deck = opp.deck
+        if (deck.length > 0) {
+          const revealed = deck.splice(0, Math.min(3, deck.length))
+          // AI keeps highest mana card on top
+          const best = revealed.reduce((b, c) => c.mana > b.mana ? c : b)
+          const rest = revealed.filter(c => c.uid !== best.uid)
+          deck.unshift(best)
+          deck.push(...rest)
+          gameState.log.push(`🤖 ${oppHero.name} uses Foresight!`)
+        }
+      } else if (effect === 'bloodprice' && gameState.player.board.length > 0) {
+        const target = gameState.player.board.reduce((best, c) => c.currentHp < best.currentHp ? c : best)
+        target.currentHp -= 3
+        opp.hp -= 1
+        gameState.log.push(`🤖 ${oppHero.name} uses Blood Price on ${target.name} for 3 damage!`)
+        gameState.player.board.forEach(c => { if (c.currentHp <= 0) gameState.player.graveyard.push({...c}) })
+        gameState.player.board = gameState.player.board.filter(c => c.currentHp > 0)
+        checkWin()
+      } else if (effect === 'unleash' && opp.board.length > 0) {
+        const target = opp.board.find(c => !c.canAttack && !c.exhausted) || opp.board[0]
+        if (!target.keywords) target.keywords = []
+        target.keywords.push('Ambush')
+        target.canAttack = true
+        target._unleashTemp = true
+        gameState.log.push(`🤖 ${oppHero.name} uses Unleash on ${target.name}!`)
+      } else if (effect === 'glacialgrasp' && gameState.player.board.length > 0) {
+        const target = gameState.player.board.reduce((best, c) => cardValue(c) > cardValue(best) ? c : best)
+        target.exhausted = true
+        target.canAttack = false
+        target._frosted = true
+        gameState.log.push(`🤖 ${oppHero.name} uses Glacial Grasp on ${target.name}!`)
+      } else {
+        // Refund if ability had no valid target
+        opp.mana += oppHero.abilityCost
+        gameState.oppHeroAbilityUsed = false
+      }
+
+      import('./main.js').then(m => m.renderBoard())
+      await new Promise(r => setTimeout(r, 400))
+    }
   }
 
   const playerBoard = gameState.player.board
@@ -464,6 +523,13 @@ async function opponentTurn() {
     checkWin()
   }
 
+  // Clean up opponent's temp Unleash keywords
+  gameState.opponent.board.forEach(c => {
+    if (c._unleashTemp) {
+      c.keywords = c.keywords.filter(k => k !== 'Ambush')
+      c._unleashTemp = false
+    }
+  })
   gameState.turn = 'player'
   gameState.phase = 'play'
   gameState.turnNumber++
@@ -509,6 +575,7 @@ export function freshGame(slot = 1, heroId = null) {
   const pd = buildDeck(slot)
   const od = buildOpponentDeck()
   const hero = heroId ? allHeroes.find(h => h.id === heroId) || null : null
+  const oppHero = allHeroes[Math.floor(Math.random() * allHeroes.length)]
 
   // Igneas passive: opponent starts with 1 less mana on turn 1
   const igneasActive = hero?.id === 'igneas'
@@ -527,6 +594,8 @@ export function freshGame(slot = 1, heroId = null) {
     _abilityTargeting: null,
     hero,
     heroAbilityUsed: false,
+    oppHero,
+    oppHeroAbilityUsed: false,
     player: { hp: 20, mana: 0, maxMana: 0, hand: pd.slice(0, 5), deck: pd.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
     opponent: { hp: 20, mana: 0, maxMana: 0, hand: od.slice(0, 5), deck: od.slice(5), board: [], graveyard: [], fatigueDamage: 0 },
   }
