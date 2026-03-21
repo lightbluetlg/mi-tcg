@@ -1673,7 +1673,9 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(ellipse at 60% 40%, #1a0a2e 0%, #050508 100%);
+  background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('/mi-tcg/Menubackground.webp');
+  background-size: cover;
+  background-position: center;
   overflow: hidden;
   position: fixed;
   inset: 0;
@@ -1792,6 +1794,8 @@ body {
   padding: 20px 0;
   gap: 4px;
   overflow-y: auto;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
 }
 
 .sidebar-title {
