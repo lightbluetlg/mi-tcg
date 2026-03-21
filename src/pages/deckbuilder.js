@@ -90,12 +90,18 @@ function renderCardThumb(card) {
         <div class="thumb-frame">
           <img src="${BASE}${rarityFrames[card.rarity]}" alt="" />
         </div>
-        <div class="thumb-mana">${card.mana}</div>
+        <div class="thumb-mana">
+          <img class="mana-icon-img" src="${BASE}pngicons/mana.png" />
+          <span class="mana-number">${card.mana}</span>
+        </div>
         ${isCover ? '<div class="cover-badge">✦</div>' : ''}
         ${count > 0 && !pickingCover ? `<div class="thumb-count">×${count}</div>` : ''}
       </div>
       <div class="thumb-name">${card.name}</div>
-      <div class="thumb-stats">⚔️${card.attack} 🩸${card.hp}</div>
+      <div class="thumb-stats">
+        <img class="badge-icon-img" src="${BASE}pngicons/crossed_swords.png" />${card.attack}
+        <img class="badge-icon-img" src="${BASE}pngicons/heart.png" />${card.hp}
+      </div>
     </div>
   `
 }

@@ -800,7 +800,7 @@ body {
 
 /* THUMBNAIL CARD */
 .thumb-card {
-  width: 140px;
+  width: 160px;
   cursor: pointer;
   transition: transform 0.15s;
   position: relative;
@@ -811,8 +811,8 @@ body {
 
 .thumb-image {
   position: relative;
-  width: 140px;
-  height: 187px;
+  width: 160px;
+  height: 214px;
   border-radius: 6px;
   overflow: visible;
 }
@@ -832,20 +832,34 @@ body {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #7ec8ff, #1a5fa0, #0a2040);
-  border: 1px solid #90cdf4;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Barlow', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #fff;
   z-index: 10;
-  box-shadow: 0 0 6px rgba(100,180,255,0.8);
+  overflow: visible;
+}
+
+.thumb-mana .mana-icon-img {
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.thumb-mana .mana-number {
+  position: relative;
+  z-index: 2;
+  margin-top: 4px;
+  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,1);
 }
 
 .thumb-count {
@@ -865,7 +879,7 @@ body {
 
 .thumb-name {
   font-family: 'Passion One', sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 400;
   color: #f0d080;
   text-align: center;
@@ -879,11 +893,15 @@ body {
 
 .thumb-stats {
   font-family: 'Barlow', sans-serif;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   text-align: center;
   color: rgba(255,255,255,0.5);
-  margin-top: 2px;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 /* DECK PANEL */
