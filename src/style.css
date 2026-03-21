@@ -1631,7 +1631,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at center, #1a0a2e 0%, #050508 100%);
+  background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('/mi-tcg/Menubackground.webp');
+  background-size: cover;
+  background-position: center;
 }
 
 .prematch-content {

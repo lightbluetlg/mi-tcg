@@ -3,7 +3,7 @@ export const allHeroes = [
     id: 'skorn',
     name: 'Lord Skorn the Wicked',
     color: '#1a1a1a',
-    borderColor: '#555555',
+    borderColor: '#aaaaaa',
     glowColor: 'rgba(80,80,80,0.6)',
     image: 'lordofskorn.webp',
     passive: 'Warden creatures gain +1 HP when played.',
