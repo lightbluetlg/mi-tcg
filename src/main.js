@@ -41,15 +41,18 @@ export function renderCard(card, context = 'hand') {
       <div class="card-frame">
         <img src="${BASE}${rarityFrames[card.rarity]}" alt="frame" />
       </div>
-      <div class="card-mana">${card.mana}</div>
+      <div class="card-mana">
+        <img class="mana-icon-img" src="${BASE}pngicons/mana.png" />
+        <span class="mana-number">${card.mana}</span>
+      </div>
       <div class="card-name">${card.name}</div>
       <div class="card-stats">
         <div class="stat-badge attack-badge">
-          <span class="badge-icon">⚔️</span>
+          <img class="badge-icon-img" src="${BASE}pngicons/crossed_swords.png" />
           <span class="badge-value">${card.attack}</span>
         </div>
         <div class="stat-badge defense-badge">
-          <span class="badge-icon">🩸</span>
+          <img class="badge-icon-img" src="${BASE}pngicons/heart.png" />
           <span class="badge-value">${card.currentHp !== undefined ? card.currentHp : card.hp}</span>
         </div>
       </div>
@@ -72,24 +75,24 @@ export function renderBoard() {
         <div class="hero-info">
           <div class="hero-portrait opponent-portrait ${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? 'attackable-hero' : ''}" id="opponent-hero">
             <div class="hero-name">${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? '⚔️ Attack!' : 'Opponent'}</div>
-            <div class="hero-hp">❤️ ${gs.opponent.hp}</div>
+            <div class="hero-hp"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.opponent.hp}</div>
           </div>
           <div class="mana-display">
             <span class="mana-label">MANA</span>
             <span class="mana-value">${gs.opponent.mana}/${gs.opponent.maxMana}</span>
           </div>
           <div class="graveyard-icon" id="graveyard-opponent" data-side="opponent">
-            💀 <span class="graveyard-count">${gs.opponent.graveyard.length}</span>
+            <img class="hero-icon-img" src="${BASE}pngicons/skull.png" /> <span class="graveyard-count">${gs.opponent.graveyard.length}</span>
           </div>
           <div class="deck-icon">
-            📚 <span class="deck-count-display">${gs.opponent.deck.length}</span>
+            <img class="hero-icon-img" src="${BASE}pngicons/cards_stack.png" /> <span class="deck-count-display">${gs.opponent.deck.length}</span>
           </div>
         </div>
       </div>
 
       <div class="board-divider">
         <div class="turn-info">
-          <span class="turn-label">${gs.turn === 'player' ? '⚔️ Your Turn' : '⏳ Opponent\'s Turn'}</span>
+          <span class="turn-label">${gs.turn === 'player' ? `<img class="hero-icon-img" src="${BASE}pngicons/crossed_swords.png" /> Your Turn` : `<img class="hero-icon-img" src="${BASE}pngicons/hourglass.png" /> Opponent's Turn`}</span>
           <span class="phase-label">${gs.phase === 'play' ? 'Play Phase' : 'Attack Phase'}</span>
         </div>
         <div class="action-buttons">
@@ -113,17 +116,17 @@ export function renderBoard() {
         <div class="hero-info">
           <div class="hero-portrait player-portrait">
             <div class="hero-name">You</div>
-            <div class="hero-hp">❤️ ${gs.player.hp}</div>
+            <div class="hero-hp"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.player.hp}</div>
           </div>
           <div class="mana-display">
             <span class="mana-label">MANA</span>
             <span class="mana-value">${gs.player.mana}/${gs.player.maxMana}</span>
           </div>
           <div class="graveyard-icon" id="graveyard-player" data-side="player">
-            💀 <span class="graveyard-count">${gs.player.graveyard.length}</span>
+            <img class="hero-icon-img" src="${BASE}pngicons/skull.png" /> <span class="graveyard-count">${gs.player.graveyard.length}</span>
           </div>
           <div class="deck-icon">
-            📚 <span class="deck-count-display">${gs.player.deck.length}</span>
+            <img class="hero-icon-img" src="${BASE}pngicons/cards_stack.png" /> <span class="deck-count-display">${gs.player.deck.length}</span>
           </div>
         </div>
       </div>
@@ -164,24 +167,27 @@ function showTooltip(card, el) {
       <div class="tooltip-frame">
         <img src="${BASE}${rarityFrames[card.rarity]}" alt="" />
       </div>
-      <div class="tooltip-mana">${card.mana}</div>
+      <div class="tooltip-mana">
+        <img class="mana-icon-img" src="${BASE}pngicons/mana.png" />
+        <span class="mana-number">${card.mana}</span>
+      </div>
     </div>
     <div class="tooltip-body">
       <div class="tooltip-name">${card.name}</div>
       <div class="tooltip-rarity" style="color:${rarityColors[card.rarity]}">${rarityLabels[card.rarity]}</div>
       <div class="tooltip-stats">
         <div class="tooltip-stat attack">
-          <span class="ts-icon">⚔️</span>
+          <img class="ts-icon-img" src="${BASE}pngicons/crossed_swords.png" />
           <span class="ts-label">Attack</span>
           <span class="ts-value">${card.attack}</span>
         </div>
         <div class="tooltip-stat hp">
-          <span class="ts-icon">🩸</span>
+          <img class="ts-icon-img" src="${BASE}pngicons/heart.png" />
           <span class="ts-label">HP</span>
           <span class="ts-value">${card.currentHp !== undefined ? card.currentHp : card.hp}</span>
         </div>
         <div class="tooltip-stat mana">
-          <span class="ts-icon">💧</span>
+          <img class="ts-icon-img" src="${BASE}pngicons/mana.png" />
           <span class="ts-label">Mana</span>
           <span class="ts-value">${card.mana}</span>
         </div>
@@ -300,7 +306,7 @@ function renderGraveyardOverlay() {
     <div class="graveyard-overlay" id="graveyard-overlay">
       <div class="graveyard-panel">
         <div class="graveyard-header">
-          <div class="graveyard-title">💀 ${title}</div>
+          <div class="graveyard-title"><img class="hero-icon-img" src="${BASE}pngicons/skull.png" style="vertical-align:middle;margin-right:6px;" /> ${title}</div>
           <button class="graveyard-close" id="graveyard-close">✕</button>
         </div>
         <div class="graveyard-cards">
