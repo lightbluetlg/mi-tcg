@@ -400,11 +400,14 @@ function attachEvents() {
   document.querySelectorAll('.card').forEach(el => {
     el.addEventListener('mouseenter', () => {
       const uid = parseInt(el.dataset.uid)
-      const card =
+      const gameCard =
         gameState.player.hand.find(c => c.uid === uid) ||
         gameState.player.board.find(c => c.uid === uid) ||
         gameState.opponent.board.find(c => c.uid === uid)
-      if (card) showTooltip(card, el)
+      if (gameCard) {
+        const baseCard = allCards.find(c => c.id === gameCard.id) || {}
+        showTooltip({ ...baseCard, ...gameCard }, el)
+      }
     })
     el.addEventListener('mouseleave', removeTooltip)
   })
