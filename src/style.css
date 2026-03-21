@@ -760,7 +760,7 @@ body {
 
 /* THUMBNAIL CARD */
 .thumb-card {
-  width: 90px;
+  width: 140px;
   cursor: pointer;
   transition: transform 0.15s;
   position: relative;
@@ -771,8 +771,8 @@ body {
 
 .thumb-image {
   position: relative;
-  width: 90px;
-  height: 120px;
+  width: 140px;
+  height: 187px;
   border-radius: 6px;
   overflow: visible;
 }
