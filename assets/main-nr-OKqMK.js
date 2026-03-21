@@ -5,12 +5,18 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="thumb-frame">
           <img src="${i}${ee[e.rarity]}" alt="" />
         </div>
-        <div class="thumb-mana">${e.mana}</div>
+        <div class="thumb-mana">
+          <img class="mana-icon-img" src="${i}pngicons/mana.png" />
+          <span class="mana-number">${e.mana}</span>
+        </div>
         ${r?`<div class="cover-badge">✦</div>`:``}
         ${t>0&&!_?`<div class="thumb-count">×${t}</div>`:``}
       </div>
       <div class="thumb-name">${e.name}</div>
-      <div class="thumb-stats">⚔️${e.attack} 🩸${e.hp}</div>
+      <div class="thumb-stats">
+        <img class="badge-icon-img" src="${i}pngicons/crossed_swords.png" />${e.attack}
+        <img class="badge-icon-img" src="${i}pngicons/heart.png" />${e.hp}
+      </div>
     </div>
   `}function oe(){let e={};return m.forEach(t=>{e[t.id]||(e[t.id]={card:t,count:0}),e[t.id].count++}),Object.values(e).sort((e,t)=>e.card.mana-t.card.mana).map(({card:e,count:t})=>`
     <div class="deck-entry rarity-${e.rarity}" data-id="${e.id}">
