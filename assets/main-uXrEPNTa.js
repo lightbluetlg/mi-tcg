@@ -242,15 +242,18 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
       <div class="card-frame">
         <img src="${V}${H[e.rarity]}" alt="frame" />
       </div>
-      <div class="card-mana">${e.mana}</div>
+      <div class="card-mana">
+        <img class="mana-icon-img" src="${V}pngicons/mana.png" />
+        <span class="mana-number">${e.mana}</span>
+      </div>
       <div class="card-name">${e.name}</div>
       <div class="card-stats">
         <div class="stat-badge attack-badge">
-          <span class="badge-icon">⚔️</span>
+          <img class="badge-icon-img" src="${V}pngicons/crossed_swords.png" />
           <span class="badge-value">${e.attack}</span>
         </div>
         <div class="stat-badge defense-badge">
-          <span class="badge-icon">🩸</span>
+          <img class="badge-icon-img" src="${V}pngicons/heart.png" />
           <span class="badge-value">${e.currentHp===void 0?e.hp:e.currentHp}</span>
         </div>
       </div>
@@ -268,24 +271,24 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="hero-info">
           <div class="hero-portrait opponent-portrait ${e.selectedCard&&e.phase===`attack`&&e.turn===`player`?`attackable-hero`:``}" id="opponent-hero">
             <div class="hero-name">${e.selectedCard&&e.phase===`attack`&&e.turn===`player`?`⚔️ Attack!`:`Opponent`}</div>
-            <div class="hero-hp">❤️ ${e.opponent.hp}</div>
+            <div class="hero-hp"><img class="hero-icon-img" src="${V}pngicons/heart.png" /> ${e.opponent.hp}</div>
           </div>
           <div class="mana-display">
             <span class="mana-label">MANA</span>
             <span class="mana-value">${e.opponent.mana}/${e.opponent.maxMana}</span>
           </div>
           <div class="graveyard-icon" id="graveyard-opponent" data-side="opponent">
-            💀 <span class="graveyard-count">${e.opponent.graveyard.length}</span>
+            <img class="hero-icon-img" src="${V}pngicons/skull.png" /> <span class="graveyard-count">${e.opponent.graveyard.length}</span>
           </div>
           <div class="deck-icon">
-            📚 <span class="deck-count-display">${e.opponent.deck.length}</span>
+            <img class="hero-icon-img" src="${V}pngicons/cards_stack.png" /> <span class="deck-count-display">${e.opponent.deck.length}</span>
           </div>
         </div>
       </div>
 
       <div class="board-divider">
         <div class="turn-info">
-          <span class="turn-label">${e.turn===`player`?`⚔️ Your Turn`:`⏳ Opponent's Turn`}</span>
+          <span class="turn-label">${e.turn===`player`?`<img class="hero-icon-img" src="${V}pngicons/crossed_swords.png" /> Your Turn`:`<img class="hero-icon-img" src="${V}pngicons/hourglass.png" /> Opponent's Turn`}</span>
           <span class="phase-label">${e.phase===`play`?`Play Phase`:`Attack Phase`}</span>
         </div>
         <div class="action-buttons">
@@ -309,17 +312,17 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="hero-info">
           <div class="hero-portrait player-portrait">
             <div class="hero-name">You</div>
-            <div class="hero-hp">❤️ ${e.player.hp}</div>
+            <div class="hero-hp"><img class="hero-icon-img" src="${V}pngicons/heart.png" /> ${e.player.hp}</div>
           </div>
           <div class="mana-display">
             <span class="mana-label">MANA</span>
             <span class="mana-value">${e.player.mana}/${e.player.maxMana}</span>
           </div>
           <div class="graveyard-icon" id="graveyard-player" data-side="player">
-            💀 <span class="graveyard-count">${e.player.graveyard.length}</span>
+            <img class="hero-icon-img" src="${V}pngicons/skull.png" /> <span class="graveyard-count">${e.player.graveyard.length}</span>
           </div>
           <div class="deck-icon">
-            📚 <span class="deck-count-display">${e.player.deck.length}</span>
+            <img class="hero-icon-img" src="${V}pngicons/cards_stack.png" /> <span class="deck-count-display">${e.player.deck.length}</span>
           </div>
         </div>
       </div>
@@ -347,24 +350,27 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
       <div class="tooltip-frame">
         <img src="${V}${H[e.rarity]}" alt="" />
       </div>
-      <div class="tooltip-mana">${e.mana}</div>
+      <div class="tooltip-mana">
+        <img class="mana-icon-img" src="${V}pngicons/mana.png" />
+        <span class="mana-number">${e.mana}</span>
+      </div>
     </div>
     <div class="tooltip-body">
       <div class="tooltip-name">${e.name}</div>
       <div class="tooltip-rarity" style="color:${r[e.rarity]}">${n[e.rarity]}</div>
       <div class="tooltip-stats">
         <div class="tooltip-stat attack">
-          <span class="ts-icon">⚔️</span>
+          <img class="ts-icon-img" src="${V}pngicons/crossed_swords.png" />
           <span class="ts-label">Attack</span>
           <span class="ts-value">${e.attack}</span>
         </div>
         <div class="tooltip-stat hp">
-          <span class="ts-icon">🩸</span>
+          <img class="ts-icon-img" src="${V}pngicons/heart.png" />
           <span class="ts-label">HP</span>
           <span class="ts-value">${e.currentHp===void 0?e.hp:e.currentHp}</span>
         </div>
         <div class="tooltip-stat mana">
-          <span class="ts-icon">💧</span>
+          <img class="ts-icon-img" src="${V}pngicons/mana.png" />
           <span class="ts-label">Mana</span>
           <span class="ts-value">${e.mana}</span>
         </div>
@@ -382,7 +388,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
     <div class="graveyard-overlay" id="graveyard-overlay">
       <div class="graveyard-panel">
         <div class="graveyard-header">
-          <div class="graveyard-title">💀 ${Z===`player`?`Your Graveyard`:`Opponent's Graveyard`}</div>
+          <div class="graveyard-title"><img class="hero-icon-img" src="${V}pngicons/skull.png" style="vertical-align:middle;margin-right:6px;" /> ${Z===`player`?`Your Graveyard`:`Opponent's Graveyard`}</div>
           <button class="graveyard-close" id="graveyard-close">✕</button>
         </div>
         <div class="graveyard-cards">
