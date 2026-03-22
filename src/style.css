@@ -36,6 +36,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .opponent-area { flex-direction: column; }
@@ -481,15 +483,16 @@ body {
   border-radius: 8px;
   cursor: pointer;
   position: relative;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: transform 0.2s ease, filter 0.2s ease, z-index 0s;
   transform-origin: bottom center;
   background: #000;
   flex-shrink: 0;
+  z-index: 1;
 }
 
 .hand-area .card { width: 145px; height: 220px; }
-.card:hover { transform: translateY(-12px) scale(1.05); }
-.hand-area .card:hover { transform: translateY(-20px) scale(1.08); }
+.card:hover { transform: translateY(-12px) scale(1.05); z-index: 100; position: relative; }
+.hand-area .card:hover { transform: translateY(-20px) scale(1.08); z-index: 100; position: relative; }
 
 .card.playable { filter: drop-shadow(0 0 8px rgba(252,211,77,0.7)); }
 .card.can-attack { filter: drop-shadow(0 0 8px rgba(255,80,80,0.7)); cursor: crosshair; }

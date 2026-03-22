@@ -1,4 +1,5 @@
 import './style.css'
+import { gsap } from 'gsap'
 import { router } from './router.js'
 import { renderMenu } from './pages/menu.js'
 import { renderDeckBuilder, getSavedDeck, getAllDecks } from './pages/deckbuilder.js'
@@ -8,6 +9,7 @@ import { allCards } from './cards.js'
 import { playSound, toggleMute, isMuted } from './audio.js'
 export const BASE = '/mi-tcg/'
 
+let tooltipCooldown = false
 const rarityFrames = {
   uncommon:  'RavenCard_Green_Frame.png',
   rare:      'RavenCard_Blue_Frame.png',
@@ -177,6 +179,7 @@ export function renderBoard() {
 
 // ── TOOLTIP
 function showTooltip(card, el) {
+  if (tooltipCooldown) return
   removeTooltip()
   const rarityLabels = { uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' }
   const rarityColors = { uncommon: '#6ee7b7', rare: '#93c5fd', epic: '#c4b5fd', legendary: '#fcd34d' }
@@ -281,8 +284,15 @@ export function animateCardDeath(uid) {
 export function animateCardPlayed(uid) {
   const el = document.querySelector(`[data-uid="${uid}"]`)
   if (!el) return
-  el.classList.add('card-played')
-  setTimeout(() => el.classList.remove('card-played'), 500)
+
+  gsap.from(el, {
+    duration: 0.4,
+    y: 80,
+    scale: 0.8,
+    rotation: -6,
+    opacity: 0,
+    ease: 'back.out(1.4)',
+  })
 }
 
 export function animateCardLunge(uid, direction = 'up') {
@@ -360,7 +370,6 @@ export function animateCardPlayedFromHand(card, isOpponent = false) {
   return new Promise(resolve => {
     const rarityFrame = rarityFrames[card.rarity]
 
-    // Create a floating card clone
     const clone = document.createElement('div')
     clone.className = `card rarity-${card.rarity}`
     clone.style.cssText = `
@@ -379,43 +388,48 @@ export function animateCardPlayedFromHand(card, isOpponent = false) {
         <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div class="card-frame" style="position:absolute;inset:0;z-index:5;pointer-events:none;">
-        <img src="/${rarityFrame}" style="width:100%;height:100%;object-fit:fill;" />
+        <img src="${BASE}${rarityFrame}" style="width:100%;height:100%;object-fit:fill;" />
       </div>
     `
 
-    // Position it where the hand card is
     const handArea = document.querySelector(isOpponent ? '.opponent-hand' : '.player-hand')
     const boardArea = document.querySelector(isOpponent ? '.opponent-field' : '.player-field')
-
     if (!handArea || !boardArea) return resolve()
 
     const handRect = handArea.getBoundingClientRect()
     const boardRect = boardArea.getBoundingClientRect()
 
-    // Start position — center of hand area
-    clone.style.left = `${handRect.left + handRect.width / 2 - (isOpponent ? 30 : 40)}px`
-    clone.style.top  = `${handRect.top}px`
+    const startX = handRect.left + handRect.width / 2 - (isOpponent ? 30 : 40)
+    const startY = handRect.top
+    const endY = boardRect.top + boardRect.height / 2 - (isOpponent ? 42 : 56)
+    const midY = startY + (endY - startY) * 0.4 - 60
 
+    clone.style.left = `${startX}px`
+    clone.style.top = `${startY}px`
     document.body.appendChild(clone)
 
-    // Calculate slide distance
-    const deltaY = boardRect.top - handRect.top
-
-    // Animate
-    clone.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease'
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        clone.style.transform = `translateY(${deltaY}px) scale(1.15)`
-        clone.style.opacity = '0.9'
-        setTimeout(() => {
-          clone.style.opacity = '0'
-          setTimeout(() => {
-            clone.remove()
-            resolve()
-          }, 400)
-        }, 350)
+    gsap.timeline({ onComplete: () => { clone.remove(); resolve() } })
+      .set(clone, { opacity: 1, scale: 1 })
+      .to(clone, {
+        duration: 0.25,
+        y: midY - startY,
+        scale: 1.3,
+        rotation: isOpponent ? 15 : -15,
+        ease: 'power2.out'
       })
-    })
+      .to(clone, {
+        duration: 0.3,
+        y: endY - startY,
+        scale: 1.05,
+        rotation: 0,
+        ease: 'power2.in'
+      })
+      .to(clone, {
+        duration: 0.15,
+        opacity: 0,
+        scale: 0.95,
+        ease: 'power1.in'
+      }, '-=0.1')
   })
 }
 // ── ATTACH EVENTS
@@ -448,6 +462,9 @@ function attachEvents() {
     el.addEventListener('click', () => {
       const uid = parseInt(el.dataset.uid)
       playCard(uid)
+      removeTooltip()
+      tooltipCooldown = true
+      setTimeout(() => { tooltipCooldown = false }, 600)
       renderBoard()
     })
   })
