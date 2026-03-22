@@ -4,6 +4,7 @@ import { router } from './router.js'
 import { renderMenu } from './pages/menu.js'
 import { renderDeckBuilder, getSavedDeck, getAllDecks } from './pages/deckbuilder.js'
 import { renderPreMatch } from './pages/prematch.js'
+import { renderPackOpening } from './pages/packopening.js'
 import { gameState, playCard, attackWithCard, attackHero, endTurn, checkWin, resolveOmen, useHeroAbility, resolveAbilityTarget } from './game.js'
 import { allCards } from './cards.js'
 import { playSound, toggleMute, isMuted } from './audio.js'
@@ -623,6 +624,7 @@ router.onChange((page, params) => {
   if (page === 'menu') renderMenu()
   if (page === 'deckbuilder') renderDeckBuilder()
   if (page === 'prematch') renderPreMatch(params)
+  if (page === 'packs') renderPackOpening()
   if (page === 'game') {
     import('./game.js').then(m => {
       const fresh = m.freshGame(params?.slot, params?.heroId)

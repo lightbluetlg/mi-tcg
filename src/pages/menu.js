@@ -15,6 +15,10 @@ const gameModes = [
   { id: 'vs-player', label: 'vs Player',  desc: 'Challenge a friend',     available: false },
 ]
 
+const packModes = [
+  { id: 'packs', label: 'Open Packs', desc: 'Open Normal & Premium packs', available: true },
+]
+
 let selectedMode = 'vs-ai'
 let selectedSlot = null
 
@@ -60,7 +64,7 @@ export function renderMenu() {
           </div>
         </div>
         <div class="topbar-actions">
-          <button class="topbar-btn" id="btn-collection">📖 Collection</button>
+          <button class="topbar-btn" id="btn-collection">Collection</button>
         </div>
       </div>
 
@@ -83,12 +87,28 @@ export function renderMenu() {
               ${mode.id === selectedMode ? '<div class="mode-active-bar"></div>' : ''}
             </div>
           `).join('')}
+
+          <div class="sidebar-divider"></div>
+          <div class="sidebar-title">Collection</div>
+
+          ${packModes.map(mode => `
+            <div class="sidebar-mode ${mode.id === selectedMode ? 'active' : ''} sidebar-mode-packs" data-mode="${mode.id}">
+              <div class="mode-art" style="overflow:hidden;border-radius:8px 0 0 8px;">
+                <img src="${BASE}packs/square.webp" style="width:100%;height:100%;object-fit:cover;opacity:0.7;" />
+              </div>
+              <div class="mode-info">
+                <div class="mode-label" style="color:#c4b5fd;">${mode.label}</div>
+                <div class="mode-desc">${mode.desc}</div>
+              </div>
+              ${mode.id === selectedMode ? '<div class="mode-active-bar" style="background:#c4b5fd;"></div>' : ''}
+            </div>
+          `).join('')}
         </div>
 
         <!-- CENTER: Deck Selection + Play -->
         <div class="newmenu-center">
           <div class="center-title">
-            ${selectedMode === 'vs-ai' ? '🤖 vs AI — Select Your Deck' : '👥 vs Player — Coming Soon'}
+            ${selectedMode === 'vs-ai' ? 'vs AI — Select Your Deck' : '👥 vs Player — Coming Soon'}
           </div>
 
           ${selectedMode === 'vs-ai' ? `
@@ -152,6 +172,10 @@ function attachMenuEvents(decks, canPlay) {
   document.querySelectorAll('.sidebar-mode').forEach(el => {
     el.addEventListener('click', () => {
       const mode = el.dataset.mode
+      if (mode === 'packs') {
+        appRouter.go('packs')
+        return
+      }
       const modeObj = gameModes.find(m => m.id === mode)
       if (!modeObj?.available) return
       selectedMode = mode
