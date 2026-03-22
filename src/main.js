@@ -11,6 +11,16 @@ import { playSound, toggleMute, isMuted } from './audio.js'
 export const BASE = '/mi-tcg/'
 
 let tooltipCooldown = false
+
+const keywordDescriptions = {
+  Ambush:  'Can attack the turn it is played.',
+  Warden:  'Enemies must attack this creature first.',
+  Leech:   'Heals your hero for damage dealt.',
+  Apex:    'Deals double damage to heroes.',
+  Hollow:  'Spawns a 1/1 Echo token when it dies.',
+  Omen:    'On play, look at the top 3 cards of your deck and keep 1 on top.',
+}
+
 const rarityFrames = {
   uncommon:  'RavenCard_Green_Frame.png',
   rare:      'RavenCard_Blue_Frame.png',
@@ -153,11 +163,14 @@ export function renderBoard() {
     ${graveyardOpen ? renderGraveyardOverlay() : ''}
     ${gs.gameOver ? `
       <div class="game-over-overlay">
-        <div class="game-over-box">
-          <div class="game-over-title">${gs.winner === 'player' ? '🏆 Victory!' : '💀 Defeat'}</div>
-          <div class="game-over-sub">${gs.winner === 'player' ? 'The opponent has fallen!' : 'You have been defeated!'}</div>
-          <button class="btn-restart" id="btn-restart">Play Again</button>
-          <button class="btn-restart" id="btn-menu" style="margin-top:10px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:#c9a84c;">🏠 Menu</button>
+        <div class="game-over-box ${gs.winner === 'player' ? 'victory-box' : 'defeat-box'}">
+          <div class="game-over-icon">${gs.winner === 'player' ? '⚔' : '✕'}</div>
+          <div class="game-over-title">${gs.winner === 'player' ? 'Victory' : 'Defeat'}</div>
+          <div class="game-over-sub">${gs.winner === 'player' ? 'The opponent has fallen' : 'You have been defeated'}</div>
+          <div class="game-over-buttons">
+            <button class="btn-gameover-primary" id="btn-restart">Play Again</button>
+            <button class="btn-gameover-secondary" id="btn-menu">Back to Menu</button>
+          </div>
         </div>
       </div>
     ` : ''}
@@ -221,11 +234,19 @@ function showTooltip(card, el) {
         </div>
       </div>
       <div class="tooltip-keywords">
-        <div class="tooltip-section-title">Keywords</div>
-        <div class="tooltip-keyword-list">${card.keywords ? card.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('') : '<span class="no-keywords">No abilities yet</span>'}</div>
+        <div class="tooltip-keyword-list">${card.keywords && card.keywords.length > 0 ? card.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('') : '<span class="no-keywords">No abilities yet</span>'}</div>
+        ${card.keywords && card.keywords.length > 0 ? `
+          <div class="tooltip-keyword-descs">
+            ${card.keywords.map(k => keywordDescriptions[k] ? `
+              <div class="tooltip-keyword-desc">
+                <span class="keyword-desc-text">${keywordDescriptions[k]}</span>
+              </div>
+            ` : '').join('')}
+          </div>
+        ` : ''}
       </div>
       <div class="tooltip-lore">
-        <div class="tooltip-section-title">Lore</div>
+        <div class="tooltip-lore-divider"></div>
         <div class="tooltip-lore-text">${card.lore || 'Ancient and mysterious, this creature\'s origins are lost to time...'}</div>
       </div>
     </div>

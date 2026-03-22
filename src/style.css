@@ -469,61 +469,135 @@ body {
 .game-over-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
+  backdrop-filter: blur(4px);
 }
 
 .game-over-box {
-  background: linear-gradient(160deg, #1a0a2e, #0d0d1a);
-  border: 2px solid #c9a84c;
-  border-radius: 16px;
+  background: rgba(10,10,20,0.85);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 20px;
   padding: 48px 64px;
   text-align: center;
-  box-shadow: 0 0 60px rgba(201,168,76,0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+  min-width: 340px;
+}
+
+.victory-box {
+  border-color: rgba(201,168,76,0.5);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 60px rgba(201,168,76,0.15);
+}
+
+.defeat-box {
+  border-color: rgba(239,68,68,0.4);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 60px rgba(239,68,68,0.1);
+}
+
+.game-over-icon {
+  font-size: 48px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.victory-box .game-over-icon {
+  color: #fcd34d;
+  text-shadow: 0 0 24px rgba(252,211,77,0.8);
+}
+
+.defeat-box .game-over-icon {
+  color: #ef4444;
+  text-shadow: 0 0 24px rgba(239,68,68,0.8);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
 }
 
 .game-over-title {
   font-family: 'Passion One', sans-serif;
-  font-size: 56px;
-  font-weight: 700;
+  font-size: 52px;
+  font-weight: 400;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.victory-box .game-over-title {
   color: #fcd34d;
-  letter-spacing: 4px;
-  text-shadow: 0 0 20px rgba(252,211,77,0.6);
+  text-shadow: 0 0 30px rgba(252,211,77,0.5);
+}
+
+.defeat-box .game-over-title {
+  color: #f87171;
+  text-shadow: 0 0 30px rgba(239,68,68,0.4);
 }
 
 .game-over-sub {
   font-family: 'Poppins', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 300;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 1px;
-  margin-bottom: 20px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
 }
 
-.btn-restart {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  padding: 12px 36px;
-  background: linear-gradient(135deg, #92400e, #b45309);
-  color: #fde68a;
-  border: 1px solid #c9a84c;
-  border-radius: 8px;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: all 0.2s;
+.game-over-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
 }
-.btn-restart:hover {
-  background: linear-gradient(135deg, #b45309, #d97706);
-  box-shadow: 0 0 20px rgba(201,168,76,0.4);
+
+.btn-gameover-primary {
+  font-family: 'Passion One', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  padding: 12px 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(201,168,76,0.6);
+  background: rgba(180,83,9,0.25);
+  color: #fde68a;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gameover-primary:hover {
+  background: rgba(180,83,9,0.45);
+  border-color: rgba(201,168,76,0.9);
+  box-shadow: 0 0 24px rgba(201,168,76,0.35);
+  transform: translateY(-1px);
+}
+
+.btn-gameover-secondary {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 10px 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.btn-gameover-secondary:hover {
+  color: #c9a84c;
+  border-color: rgba(201,168,76,0.4);
+  background: rgba(201,168,76,0.06);
 }
 
 /* ══════════════════════════════
@@ -1455,6 +1529,43 @@ body {
   font-weight: 300;
   color: rgba(255,255,255,0.2);
   font-style: italic;
+}
+
+.tooltip-keyword-descs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tooltip-keyword-desc {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.5);
+}
+
+.keyword-desc-name {
+  font-weight: 600;
+  color: #fcd34d;
+  margin-right: 3px;
+}
+
+.keyword-desc-text {
+  font-weight: 300;
+  font-style: italic;
+}
+
+.tooltip-lore-divider {
+  height: 1px;
+  margin-bottom: 8px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.08) 30%,
+    rgba(255,255,255,0.08) 70%,
+    transparent 100%
+  );
 }
 
 .tooltip-lore-text {
