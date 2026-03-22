@@ -77,5 +77,6 @@ function renderHeroSelect() {
   document.getElementById('btn-back')?.addEventListener('click', () => {
     router.go('menu')
   })
+
 }
 

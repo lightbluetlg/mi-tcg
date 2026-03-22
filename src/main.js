@@ -68,7 +68,7 @@ export function renderBoard() {
         <div class="hand-area opponent-hand">
           ${gs.opponent.hand.map(() => `<div class="card-back"></div>`).join('')}
         </div>
-        <div class="battlefield opponent-field" id="opponent-field">
+        <div class="battlefield opponent-field ${gs.turn === 'opponent' ? 'opponent-turn' : ''}" id="opponent-field">
           ${gs.opponent.board.map(c => renderCard(c, 'board')).join('')}
           ${gs.opponent.board.length === 0 ? '' : ''}
         </div>
@@ -98,8 +98,8 @@ export function renderBoard() {
           <span class="turn-label">${gs.turn === 'player' ? `<img class="hero-icon-img" src="${BASE}pngicons/crossed_swords.png" /> Your Turn` : `<img class="hero-icon-img" src="${BASE}pngicons/hourglass.png" /> Opponent's Turn`}</span>
           <span class="phase-label">${gs.phase === 'play' ? 'Play Phase' : 'Attack Phase'}</span>
         </div>
-        <div class="action-buttons">
-          <button class="btn-back-menu" id="btn-back-menu">🏠 Menu</button>
+        <div class="action-buttons" id="action-buttons">
+          <button class="btn-back-menu" id="btn-back-menu">Menu</button>
           <button class="btn-mute" id="btn-mute">${isMuted() ? '🔇' : '🔊'}</button>
           ${gs.turn === 'player' ? `
             ${gs.phase === 'play' ? `<button class="btn-phase" id="btn-attack-phase">Attack Phase →</button>` : ''}
@@ -112,7 +112,7 @@ export function renderBoard() {
         <div class="hand-area player-hand" id="player-hand">
           ${gs.player.hand.map(c => renderCard(c, 'hand')).join('')}
         </div>
-        <div class="battlefield player-field" id="player-field">
+        <div class="battlefield player-field ${gs.turn === 'player' ? 'your-turn' : ''}" id="player-field">
           ${gs.player.board.map(c => renderCard(c, 'board')).join('')}
           ${gs.player.board.length === 0 ? '' : ''}
         </div>
@@ -473,7 +473,6 @@ function attachEvents() {
     }
   })
 
-  // Phase buttons
   document.getElementById('btn-mute')?.addEventListener('click', () => {
     toggleMute()
     renderBoard()

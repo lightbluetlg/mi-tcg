@@ -144,8 +144,8 @@ body {
   align-items: center;
   gap: 12px;
   min-height: 120px;
-  background: rgba(0,0,0,0.4);
-  border: 1px dashed rgba(201,168,76,0.2);
+  background: rgba(0,0,0,0.25);
+  border: none;
   border-radius: 10px;
   padding: 8px;
 }
@@ -190,14 +190,79 @@ body {
 .board-divider {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 4px 20px;
-  background: rgba(0,0,0,0.3);
-  border-top: 1px solid rgba(201,168,76,0.15);
-  border-bottom: 1px solid rgba(201,168,76,0.15);
+  justify-content: flex-start;
+  padding: 0 20px;
+  height: 28px;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+  overflow: visible;
 }
 
-.turn-info { display: flex; gap: 16px; align-items: center; }
+/* Static base line */
+.board-divider::before {
+  content: '';
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201,168,76,0.25) 15%,
+    rgba(201,168,76,0.55) 50%,
+    rgba(201,168,76,0.25) 85%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Shimmer growing from center outward */
+.board-divider::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 1px;
+  width: 90%;
+  transform: translate(-50%, -50%) scaleX(0);
+  transform-origin: center;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,220,120,0.9) 50%,
+    transparent 100%
+  );
+  box-shadow: 0 0 6px rgba(201,168,76,0.8);
+  animation: shimmer-outward 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes shimmer-outward {
+  0%   { transform: translate(-50%, -50%) scaleX(0); opacity: 0; }
+  15%  { opacity: 1; }
+  60%  { transform: translate(-50%, -50%) scaleX(1); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scaleX(1); opacity: 0; }
+}
+
+.board-divider > * {
+  position: relative;
+  z-index: 2;
+}
+
+.turn-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+  padding: 3px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(201,168,76,0.15);
+  backdrop-filter: blur(4px);
+}
 
 .turn-label {
   font-family: 'Passion One', sans-serif;
@@ -216,7 +281,17 @@ body {
   letter-spacing: 1px;
 }
 
-.action-buttons { display: flex; gap: 10px; align-items: center; }
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  flex-direction: row;
+}
 
 .btn-phase, .btn-end-turn {
   font-family: 'Poppins', sans-serif;
@@ -259,17 +334,19 @@ body {
   font-weight: 600;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(0,0,0,0.4);
-  color: rgba(255,255,255,0.5);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px;
+  background: rgba(0,0,0,0.5);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
+  backdrop-filter: blur(4px);
 }
 .btn-back-menu:hover {
   color: #c9a84c;
-  border-color: #c9a84c;
+  border-color: rgba(201,168,76,0.6);
+  background: rgba(0,0,0,0.65);
 }
 
 /* ══════════════════════════════
@@ -2516,4 +2593,64 @@ body {
 @keyframes screen-fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════
+   HERO PORTRAIT HOVER EFFECT
+══════════════════════════════ */
+.hero-portrait-art {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-portrait-art img {
+  transition: transform 0.4s ease;
+}
+
+.hero-card:hover .hero-portrait-art img {
+  transform: scale(1.07);
+}
+
+.hero-portrait-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255,255,255,0.12) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  transition: transform 0s;
+}
+
+.hero-card:hover .hero-portrait-art::after {
+  transform: translateX(100%);
+  transition: transform 0.5s ease;
+}
+
+/* ══════════════════════════════
+   BATTLEFIELD TURN GLOW
+══════════════════════════════ */
+.player-field {
+  transition: box-shadow 0.6s ease, border-color 0.6s ease;
+}
+
+.opponent-field {
+  transition: box-shadow 0.6s ease, border-color 0.6s ease;
+}
+
+.player-field.your-turn {
+  border-color: rgba(201,168,76,0.6);
+  box-shadow:
+    inset 0 0 30px rgba(201,168,76,0.15),
+    0 0 20px rgba(201,168,76,0.1);
+}
+
+.opponent-field.opponent-turn {
+  border-color: rgba(239,68,68,0.5);
+  box-shadow:
+    inset 0 0 30px rgba(239,68,68,0.12),
+    0 0 20px rgba(239,68,68,0.08);
 }
