@@ -115,7 +115,10 @@ function renderDeckList() {
   const entries = Object.values(grouped).sort((a, b) => a.card.mana - b.card.mana)
   return entries.map(({ card, count }) => `
     <div class="deck-entry rarity-${card.rarity}" data-id="${card.id}">
-      <div class="deck-entry-mana">${card.mana}</div>
+      <div class="deck-entry-mana">
+        <img src="/mi-tcg/pngicons/mana.png" style="position:absolute;width:28px;height:28px;object-fit:contain;" />
+        <span style="position:relative;z-index:2;text-shadow:0 0 6px rgba(0,0,0,1),0 0 12px rgba(0,0,0,1),0 2px 4px rgba(0,0,0,1);">${card.mana}</span>
+      </div>
       <div class="deck-entry-name">${card.name}</div>
       <div class="deck-entry-count">×${count}</div>
       <button class="deck-entry-remove" data-id="${card.id}">✕</button>

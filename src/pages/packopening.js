@@ -293,9 +293,9 @@ function showCards(cards, isPremium, container) {
           <div class="card-frame" style="position:absolute;inset:0;z-index:5;pointer-events:none;">
             <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
           </div>
-          <div class="card-mana" style="position:absolute;top:4px;left:4px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;z-index:20;overflow:visible;">
-            <img class="mana-icon-img" src="${BASE}pngicons/mana.png" style="position:absolute;width:36px;height:36px;" />
-            <span style="position:relative;z-index:2;font-family:Barlow,sans-serif;font-weight:700;font-size:13px;color:#fff;text-shadow:0 0 6px rgba(0,0,0,1);margin-top:4px;">${card.mana}</span>
+          <div style="position:absolute;top:3px;left:3px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;z-index:20;">
+            <img src="${BASE}pngicons/mana.png" style="position:absolute;width:36px;height:36px;object-fit:contain;z-index:1;" />
+            <span style="position:relative;z-index:3;font-family:Barlow,sans-serif;font-weight:900;font-size:13px;color:#fff;margin-top:0px;text-shadow:0 0 4px rgba(0,0,0,1),0 0 8px rgba(0,0,0,1),0 0 16px rgba(0,0,0,1),-1px -1px 0 rgba(0,0,0,1),1px -1px 0 rgba(0,0,0,1),-1px 1px 0 rgba(0,0,0,1),1px 1px 0 rgba(0,0,0,1);">${card.mana}</span>
           </div>
           <div style="position:absolute;bottom:28px;left:4px;right:4px;z-index:20;text-align:center;font-family:'Passion One',sans-serif;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;padding:2px 4px;border-radius:2px;background:rgba(0,0,0,0.6);color:${rarityColors[card.rarity]};text-shadow:0 1px 2px rgba(0,0,0,0.9);">${card.name}</div>
           <div style="position:absolute;bottom:4px;left:4px;right:4px;display:flex;justify-content:space-between;z-index:20;">

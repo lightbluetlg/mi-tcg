@@ -776,8 +776,8 @@ body {
 }
 
 .mana-icon-img {
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
   position: absolute;
   top: 50%;
@@ -789,8 +789,18 @@ body {
 .mana-number {
   position: relative;
   z-index: 2;
-  margin-top: 6px;
-  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,1);
+  margin-top: 0px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow:
+    0 0 4px rgba(0,0,0,1),
+    0 0 8px rgba(0,0,0,1),
+    0 0 16px rgba(0,0,0,1),
+    0 2px 3px rgba(0,0,0,1),
+    -1px -1px 0 rgba(0,0,0,0.8),
+    1px -1px 0 rgba(0,0,0,0.8),
+    -1px 1px 0 rgba(0,0,0,0.8),
+    1px 1px 0 rgba(0,0,0,0.8);
 }
 
 .attack-badge  { color: #ff7070; border: 1px solid rgba(180,40,40,0.6); text-shadow: 0 0 6px rgba(255,80,80,0.8); }
@@ -1086,7 +1096,7 @@ body {
   align-items: center;
   justify-content: center;
   font-family: 'Barlow', sans-serif;
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 700;
   color: #fff;
   z-index: 10;
@@ -1106,8 +1116,18 @@ body {
 .thumb-mana .mana-number {
   position: relative;
   z-index: 2;
-  margin-top: 4px;
-  text-shadow: 0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,1);
+  margin-top: 0px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow:
+    0 0 4px rgba(0,0,0,1),
+    0 0 8px rgba(0,0,0,1),
+    0 0 16px rgba(0,0,0,1),
+    0 2px 3px rgba(0,0,0,1),
+    -1px -1px 0 rgba(0,0,0,0.8),
+    1px -1px 0 rgba(0,0,0,0.8),
+    -1px 1px 0 rgba(0,0,0,0.8),
+    1px 1px 0 rgba(0,0,0,0.8);
 }
 
 .thumb-count {
@@ -1204,20 +1224,20 @@ body {
 .deck-entry:hover { background: rgba(255,255,255,0.04); }
 
 .deck-entry-mana {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #7ec8ff, #1a5fa0, #0a2040);
-  border: 1px solid #90cdf4;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Barlow', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 0 6px rgba(100,180,255,0.6);
+  position: relative;
+  overflow: visible;
 }
 
 .deck-entry-name {
@@ -1416,8 +1436,8 @@ body {
 }
 
 .tooltip-mana .mana-icon-img {
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1428,7 +1448,7 @@ body {
 .tooltip-mana .mana-number {
   position: relative;
   z-index: 2;
-  margin-top: 8px;
+  margin-top: 0px;
 }
 
 .tooltip-body {

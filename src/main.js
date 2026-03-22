@@ -589,7 +589,7 @@ export function showOmenModal(cards) {
             <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
           </div>
           <div style="position:absolute;top:3px;left:3px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;z-index:10;">
-            <img src="${BASE}pngicons/mana.png" style="position:absolute;width:32px;height:32px;object-fit:contain;" />
+            <img src="${BASE}pngicons/mana.png" style="position:absolute;width:36px;height:36px;object-fit:contain;" />
             <span style="position:relative;z-index:2;font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#fff;text-shadow:0 0 6px rgba(0,0,0,1),0 0 12px rgba(0,0,0,1);margin-top:4px;">${card.mana}</span>
           </div>
           <div style="position:absolute;bottom:0;left:0;right:0;z-index:10;
