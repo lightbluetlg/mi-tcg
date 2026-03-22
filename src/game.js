@@ -109,7 +109,7 @@ export function playCard(uid) {
   if (idx === -1) return
   const card = gameState.player.hand[idx]
   if (card.mana > gameState.player.mana) {
-    gameState.log.push(`❌ Not enough mana to play ${card.name}.`)
+    gameState.log.push(`<span class="log-damage">❌ Not enough mana to play ${card.name}.</span>`)
     return
   }
   gameState.player.mana -= card.mana
@@ -124,11 +124,11 @@ export function playCard(uid) {
     if (hero.id === 'skorn' && card.keywords?.includes('Warden')) {
       card.hp += 1
       card.currentHp += 1
-      gameState.log.push(`🖤 Lord Skorn's passive: ${card.name} gains +1 HP!`)
+      gameState.log.push(`<span class="log-special">🖤 Lord Skorn's passive: ${card.name} gains +1 HP!</span>`)
     }
     if (hero.id === 'djinn' && card.keywords?.includes('Ambush')) {
       card.attack += 1
-      gameState.log.push(`✨ Djinn Colossus passive: ${card.name} gains +1 Attack!`)
+      gameState.log.push(`<span class="log-special">✨ Djinn passive: ${card.name} gains +1 Attack!</span>`)
     }
     if (hero.id === 'djinn' && !hasAmbush) {
       // Unleash effect carries over if active
@@ -138,7 +138,7 @@ export function playCard(uid) {
   card.canAttack = hasAmbush ? true : false
   card.exhausted = false
   gameState.player.board.push(card)
-  gameState.log.push(`▶️ You played ${card.name}.`)
+  gameState.log.push(`<span class="log-special">▶️ You played ${card.name}.</span>`)
   playSound('card_play')
   setTimeout(() => animateCardPlayed(card.uid), 50)
 
@@ -157,17 +157,17 @@ export async function attackWithCard(uid) {
   // Clicking your own creature to select it
   if (attacker && !attacker.isOpponent) {
     if (!attacker.canAttack) {
-      gameState.log.push(`😴 ${attacker.name} has summoning sickness — wait a turn.`)
+      gameState.log.push(`<span class="log-damage">😴 ${attacker.name} has summoning sickness — wait a turn.</span>`)
       gameState.selectedCard = null
       return
     }
     if (attacker.exhausted) {
-      gameState.log.push(`😓 ${attacker.name} already attacked this turn.`)
+      gameState.log.push(`<span class="log-damage">😓 ${attacker.name} already attacked this turn.</span>`)
       gameState.selectedCard = null
       return
     }
     gameState.selectedCard = attacker
-    gameState.log.push(`🎯 ${attacker.name} ready — click an enemy creature or the opponent's hero.`)
+    gameState.log.push(`<span class="log-special">🎯 ${attacker.name} ready — click an enemy creature or the opponent's hero.</span>`)
     return
   }
 
@@ -179,7 +179,7 @@ export async function attackWithCard(uid) {
       // Warden check: must attack a Warden if one exists
       const wardens = gameState.opponent.board.filter(c => c.keywords?.includes('Warden'))
       if (wardens.length > 0 && !target.keywords?.includes('Warden')) {
-        gameState.log.push(`🛡️ You must attack a Warden creature first!`)
+        gameState.log.push(`<span class="log-special">🛡️ You must attack a Warden creature first!</span>`)
         gameState.selectedCard = null
         return
       }
@@ -198,7 +198,7 @@ export function attackHero(attackerUid) {
   // Warden check: cannot attack hero while any Warden is on opponent board
   const wardens = gameState.opponent.board.filter(c => c.keywords?.includes('Warden'))
   if (wardens.length > 0) {
-    gameState.log.push(`🛡️ Can't attack the hero — a Warden is protecting them!`)
+    gameState.log.push(`<span class="log-special">🛡️ Can't attack the hero — a Warden is protecting them!</span>`)
     gameState.selectedCard = null
     return
   }
@@ -213,12 +213,12 @@ export function attackHero(attackerUid) {
   gameState.selectedCard = null
   animateHeroHit('opponent')
   playSound('attack')
-  gameState.log.push(`⚔️ ${attacker.name} attacked the enemy hero for ${damage}!${attacker.keywords?.includes('Apex') ? ' (Apex - double damage!)' : ''}`)
+  gameState.log.push(`<span class="log-damage">⚔️ ${attacker.name} attacked the enemy hero for ${damage}!${attacker.keywords?.includes('Apex') ? ' (Apex - double damage!)' : ''}</span>`)
 
   // Leech: heal your hero for damage dealt
   if (attacker.keywords?.includes('Leech')) {
     gameState.player.hp = Math.min(30, gameState.player.hp + damage)
-    gameState.log.push(`🩸 ${attacker.name} leeched ${damage} HP back to you!`)
+    gameState.log.push(`<span class="log-heal">🩸 ${attacker.name} leeched ${damage} HP back to you!</span>`)
   }
 
   checkWin()
@@ -247,19 +247,19 @@ async function resolveCombat(attacker, defender) {
   defender.currentHp -= attacker.attack
   attacker.exhausted = true
 
-  gameState.log.push(`⚔️ ${attacker.name} (${attacker.attack} atk) vs ${defender.name} (${defender.attack} atk)`)
+  gameState.log.push(`<span class="log-damage">⚔️ ${attacker.name} (${attacker.attack} atk) vs ${defender.name} (${defender.attack} atk)</span>`)
 
   // Leech: attacker heals its owner's hero for damage dealt
   if (attacker.keywords?.includes('Leech')) {
     const leecher = attacker.isOpponent ? gameState.opponent : gameState.player
     leecher.hp = Math.min(30, leecher.hp + attacker.attack)
-    gameState.log.push(`🩸 ${attacker.name} leeched ${attacker.attack} HP!`)
+    gameState.log.push(`<span class="log-heal">🩸 ${attacker.name} leeched ${attacker.attack} HP!</span>`)
   }
 
   // Death animations
   const dyingUids = []
-  if (attacker.currentHp <= 0) { dyingUids.push(attacker.uid); gameState.log.push(`💀 ${attacker.name} died.`) }
-  if (defender.currentHp <= 0) { dyingUids.push(defender.uid); gameState.log.push(`💀 ${defender.name} died.`) }
+  if (attacker.currentHp <= 0) { dyingUids.push(attacker.uid); gameState.log.push(`<span class="log-death">💀 ${attacker.name} died.</span>`) }
+  if (defender.currentHp <= 0) { dyingUids.push(defender.uid); gameState.log.push(`<span class="log-death">💀 ${defender.name} died.</span>`) }
 
   if (dyingUids.length > 0) {
     playSound('death')
@@ -292,7 +292,7 @@ async function resolveCombat(attacker, defender) {
           isOpponent: dying.isOpponent,
         }
         owner.board.push(echo)
-        gameState.log.push(`👻 ${dying.name}'s Hollow summoned a 1/1 Echo token!`)
+        gameState.log.push(`<span class="log-special">👻 ${dying.name}'s Hollow summoned a 1/1 Echo token!</span>`)
       }
     }
   }
@@ -317,7 +317,7 @@ export function endTurn() {
   gameState.selectedCard = null
   gameState._abilityTargeting = null
   gameState.turn = 'opponent'
-  gameState.log.push(`⏭️ You ended your turn.`)
+  gameState.log.push(`<span class="log-turn">⏭️ You ended your turn.</span>`)
   setTimeout(() => { opponentTurn() }, 800)
 }
 
@@ -385,7 +385,7 @@ async function opponentTurn() {
     opp.mana -= card.mana
     card.canAttack = card.keywords?.includes('Ambush') ? true : false
     card.exhausted = false
-    gameState.log.push(`🤖 Opponent played ${card.name}.`)
+    gameState.log.push(`<span class="log-special">🤖 Opponent played ${card.name}.</span>`)
     playSound('card_play')
     await animateCardPlayedFromHand(card, true)
     opp.board.push(card)
@@ -406,7 +406,7 @@ async function opponentTurn() {
         const target = opp.board.reduce((best, c) => c.currentHp > best.currentHp ? c : best)
         target.hp += 2
         target.currentHp += 2
-        gameState.log.push(`🤖 ${oppHero.name} uses Fortify on ${target.name}! (+2 HP)`)
+        gameState.log.push(`<span class="log-special">🤖 ${oppHero.name} uses Fortify on ${target.name}! (+2 HP)</span>`)
       } else if (effect === 'foresight') {
         // AI just draws top card essentially — peek and keep best
         const deck = opp.deck
@@ -417,13 +417,13 @@ async function opponentTurn() {
           const rest = revealed.filter(c => c.uid !== best.uid)
           deck.unshift(best)
           deck.push(...rest)
-          gameState.log.push(`🤖 ${oppHero.name} uses Foresight!`)
+          gameState.log.push(`<span class="log-special">🤖 ${oppHero.name} uses Foresight!</span>`)
         }
       } else if (effect === 'bloodprice' && gameState.player.board.length > 0) {
         const target = gameState.player.board.reduce((best, c) => c.currentHp < best.currentHp ? c : best)
         target.currentHp -= 3
         opp.hp -= 1
-        gameState.log.push(`🤖 ${oppHero.name} uses Blood Price on ${target.name} for 3 damage!`)
+        gameState.log.push(`<span class="log-special">🤖 ${oppHero.name} uses Blood Price on ${target.name} for 3 damage!</span>`)
         gameState.player.board.forEach(c => { if (c.currentHp <= 0) gameState.player.graveyard.push({...c}) })
         gameState.player.board = gameState.player.board.filter(c => c.currentHp > 0)
         checkWin()
@@ -433,13 +433,13 @@ async function opponentTurn() {
         target.keywords.push('Ambush')
         target.canAttack = true
         target._unleashTemp = true
-        gameState.log.push(`🤖 ${oppHero.name} uses Unleash on ${target.name}!`)
+        gameState.log.push(`<span class="log-special">🤖 ${oppHero.name} uses Unleash on ${target.name}!</span>`)
       } else if (effect === 'glacialgrasp' && gameState.player.board.length > 0) {
         const target = gameState.player.board.reduce((best, c) => cardValue(c) > cardValue(best) ? c : best)
         target.exhausted = true
         target.canAttack = false
         target._frosted = true
-        gameState.log.push(`🤖 ${oppHero.name} uses Glacial Grasp on ${target.name}!`)
+        gameState.log.push(`<span class="log-special">🤖 ${oppHero.name} uses Glacial Grasp on ${target.name}!</span>`)
       } else {
         // Refund if ability had no valid target
         opp.mana += oppHero.abilityCost
@@ -467,7 +467,7 @@ async function opponentTurn() {
       attacker.exhausted = true
       animateHeroHit('player')
       playSound('attack')
-      gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${damage}! (LETHAL)`)
+      gameState.log.push(`<span class="log-damage">🤖 ${attacker.name} attacked your hero for ${damage}! (LETHAL)</span>`)
       checkWin()
       if (gameState.gameOver) break
     }
@@ -491,7 +491,7 @@ async function opponentTurn() {
         attacker.exhausted = true
         animateHeroHit('player')
         playSound('attack')
-        gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${damage}!`)
+        gameState.log.push(`<span class="log-damage">🤖 ${attacker.name} attacked your hero for ${damage}!</span>`)
         checkWin()
       }
 
@@ -507,7 +507,7 @@ async function opponentTurn() {
         attacker.exhausted = true
         animateHeroHit('player')
         playSound('attack')
-        gameState.log.push(`🤖 ${attacker.name} attacked your hero for ${damage}!`)
+        gameState.log.push(`<span class="log-damage">🤖 ${attacker.name} attacked your hero for ${damage}!</span>`)
         checkWin()
         if (gameState.gameOver) break
       }
@@ -519,7 +519,7 @@ async function opponentTurn() {
   } else {
     opp.fatigueDamage += 1
     opp.hp -= opp.fatigueDamage
-    gameState.log.push(`💀 Opponent has no cards! Fatigue deals ${opp.fatigueDamage} damage.`)
+    gameState.log.push(`<span class="log-death">💀 Opponent has no cards! Fatigue deals ${opp.fatigueDamage} damage.</span>`)
     checkWin()
   }
 
@@ -544,13 +544,13 @@ async function opponentTurn() {
   } else {
     gameState.player.fatigueDamage += 1
     gameState.player.hp -= gameState.player.fatigueDamage
-    gameState.log.push(`💀 You have no cards! Fatigue deals ${gameState.player.fatigueDamage} damage.`)
+    gameState.log.push(`<span class="log-death">💀 You have no cards! Fatigue deals ${gameState.player.fatigueDamage} damage.</span>`)
     checkWin()
   }
 
   playSound('turn')
   playSound('card_draw')
-  gameState.log.push(`🎮 Your turn! Mana: ${gameState.player.mana}`)
+  gameState.log.push(`<span class="log-turn">🎮 Your turn! Mana: ${gameState.player.mana}</span>`)
 
   import('./main.js').then(m => m.renderBoard())
 }

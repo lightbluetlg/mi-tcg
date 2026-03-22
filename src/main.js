@@ -144,8 +144,7 @@ export function renderBoard() {
       </div>
     </div>
 
-    <div class="message-log" id="message-log">
-      ${gs.log.slice(-4).map(m => `<div class="log-entry">${m}</div>`).join('')}
+    <div class="message-log" id="message-log" id="message-log">
     </div>
 
     ${graveyardOpen ? renderGraveyardOverlay() : ''}
@@ -160,6 +159,19 @@ export function renderBoard() {
       </div>
     ` : ''}
   `
+  const logEl = document.getElementById('message-log')
+  if (logEl) {
+    logEl.innerHTML = gs.log.slice(-4).map(m => {
+      const clean = m.replace(/<[^>]+>/g, '')
+      let cls = ''
+      if (clean.includes('💀') || clean.includes('died') || clean.includes('Fatigue') || clean.includes('lost')) cls = 'log-death'
+      else if (clean.includes('⚔️') || clean.includes('attacked') || clean.includes('❌') || clean.includes('damage')) cls = 'log-damage'
+      else if (clean.includes('🩸') || clean.includes('leeched') || clean.includes('heal')) cls = 'log-heal'
+      else if (clean.includes('⏭️') || clean.includes('ended') || clean.includes('🎮') || clean.includes('🎲')) cls = 'log-turn'
+      else cls = 'log-special'
+      return `<div class="log-entry ${cls}">${clean}</div>`
+    }).join('')
+  }
   attachEvents()
 }
 
@@ -469,7 +481,7 @@ function attachEvents() {
 
   document.getElementById('btn-attack-phase')?.addEventListener('click', () => {
     gameState.phase = 'attack'
-    gameState.log.push('⚔️ Attack phase started.')
+    gameState.log.push('<span class="log-damage">⚔️ Attack phase started.</span>')
     renderBoard()
   })
 
