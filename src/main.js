@@ -246,7 +246,7 @@ function showTooltip(card, el) {
   tooltip.style.top = `${top}px`
 }
 
-function removeTooltip() {
+export function removeTooltip() {
   document.getElementById('card-tooltip')?.remove()
 }
 

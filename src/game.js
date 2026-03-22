@@ -372,7 +372,10 @@ async function opponentTurn() {
     opp.mana = opp.maxMana
   }
 
-  opp.board.forEach(c => { c.canAttack = true; c.exhausted = false })
+  opp.board.forEach(c => {
+    c.canAttack = true
+    c.exhausted = false
+  })
   gameState.oppHeroAbilityUsed = false
   const existingAttackerUids = opp.board.map(c => c.uid)
 
@@ -454,7 +457,11 @@ async function opponentTurn() {
   const playerBoard = gameState.player.board
   const availableAttackers = existingAttackerUids
     .map(uid => opp.board.find(c => c.uid === uid))
-    .filter(c => c && c.currentHp > 0 && !c.exhausted)
+    .filter(c => {
+      if (!c || c.currentHp <= 0 || c.exhausted) return false
+      if (c._frosted) { c._frosted = false; c.canAttack = false; c.exhausted = true; return false }
+      return true
+    })
 
   // AI respects player's Warden creatures
   const playerWardens = gameState.player.board.filter(c => c.keywords?.includes('Warden'))
@@ -687,18 +694,42 @@ export function resolveAbilityTarget(uid) {
     playerCard.hp += 2
     playerCard.currentHp += 2
     gameState.log.push(`🛡️ ${playerCard.name} gains +2 HP from Fortify!`)
+    playSound('card_play')
+    import('./main.js').then(m => {
+      const targetEl = document.querySelector(`[data-uid="${playerCard.uid}"]`)
+      if (targetEl) m.floatDamage(2, targetEl, true)
+    })
   } else if (effect === 'bloodprice') {
     const target = playerCard || opponentCard
     if (!target) return false
     target.currentHp -= 3
     gameState.player.hp -= 1
     gameState.log.push(`🩸 Blood Price deals 3 damage to ${target.name}! You lose 1 HP.`)
-    // Remove dead creatures
-    gameState.player.board.forEach(c => { if (c.currentHp <= 0) gameState.player.graveyard.push({...c}) })
-    gameState.opponent.board.forEach(c => { if (c.currentHp <= 0) gameState.opponent.graveyard.push({...c}) })
-    gameState.player.board = gameState.player.board.filter(c => c.currentHp > 0)
-    gameState.opponent.board = gameState.opponent.board.filter(c => c.currentHp > 0)
-    checkWin()
+    import('./main.js').then(async m => {
+      m.removeTooltip()
+      const targetEl = document.querySelector(`[data-uid="${target.uid}"]`)
+      if (targetEl) {
+        m.animateCardHit(target.uid)
+        m.floatDamage(3, targetEl)
+      }
+      playSound('attack')
+      if (target.currentHp <= 0) playSound('death')
+      const dying = [
+        ...gameState.player.board.filter(c => c.currentHp <= 0),
+        ...gameState.opponent.board.filter(c => c.currentHp <= 0),
+      ]
+      if (dying.length > 0) {
+        await Promise.all(dying.map(c => m.animateCardDeath(c.uid)))
+      }
+      gameState.player.board.forEach(c => { if (c.currentHp <= 0) gameState.player.graveyard.push({...c}) })
+      gameState.opponent.board.forEach(c => { if (c.currentHp <= 0) gameState.opponent.graveyard.push({...c}) })
+      gameState.player.board = gameState.player.board.filter(c => c.currentHp > 0)
+      gameState.opponent.board = gameState.opponent.board.filter(c => c.currentHp > 0)
+      checkWin()
+      m.renderBoard()
+    })
+    gameState._abilityTargeting = null
+    return true
   } else if (effect === 'unleash') {
     if (!playerCard) return false
     if (!playerCard.keywords) playerCard.keywords = []
