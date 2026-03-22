@@ -281,7 +281,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
             <div class="hero-name" style="${e.oppHero?`color: ${e.oppHero.borderColor};`:``}">
               ${e.selectedCard&&e.phase===`attack`&&e.turn===`player`?`Attack!`:e.oppHero?e.oppHero.name:`Opponent`}
             </div>
-            <div class="hero-hp"><img class="hero-icon-img" src="${$}pngicons/heart.png" /> ${e.opponent.hp}</div>
+            <div class="hero-hp ${parseInt(e.opponent.hp)<=5?`danger`:``}"><img class="hero-icon-img" src="${$}pngicons/heart.png" /> ${e.opponent.hp}</div>
           </div>
           <div class="mana-display">
             <span class="mana-label">MANA</span>
@@ -322,7 +322,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="hero-info">
           <div class="hero-portrait player-portrait" style="${e.hero?`border-color: ${e.hero.borderColor}; box-shadow: 0 0 12px ${e.hero.glowColor};`:``}">
             <div class="hero-name" style="${e.hero?`color: ${e.hero.borderColor};`:``}">${e.hero?e.hero.name:`You`}</div>
-            <div class="hero-hp"><img class="hero-icon-img" src="${$}pngicons/heart.png" /> ${e.player.hp}</div>
+            <div class="hero-hp ${parseInt(e.player.hp)<=5?`danger`:``}"><img class="hero-icon-img" src="${$}pngicons/heart.png" /> ${e.player.hp}</div>
           </div>
           ${e.hero&&e.turn===`player`?`
             <button class="btn-hero-ability ${e.heroAbilityUsed?`used`:``} ${e._abilityTargeting?`targeting`:``}"
