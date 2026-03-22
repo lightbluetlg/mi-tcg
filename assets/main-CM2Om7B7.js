@@ -244,7 +244,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
           `).join(``)}
         </div>
 
-        <button class="btn-confirm-hero" id="btn-confirm-hero" style="display:none;"><img src="/mi-tcg/pngicons/crossed_swords.png" style="width:32px;height:32px;vertical-align:middle;margin-right:10px;" />Confirm Hero</button>
+        <button class="btn-confirm-hero" id="btn-confirm-hero" style="display:none;">Confirm Hero</button>
         <button class="btn-back prematch-back" id="btn-back">← Back</button>
       </div>
     </div>
