@@ -271,7 +271,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="hand-area opponent-hand">
           ${e.opponent.hand.map(()=>`<div class="card-back"></div>`).join(``)}
         </div>
-        <div class="battlefield opponent-field" id="opponent-field">
+        <div class="battlefield opponent-field ${e.turn===`opponent`?`opponent-turn`:``}" id="opponent-field">
           ${e.opponent.board.map(e=>U(e,`board`)).join(``)}
           ${e.opponent.board.length,``}
         </div>
@@ -301,8 +301,8 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
           <span class="turn-label">${e.turn===`player`?`<img class="hero-icon-img" src="${V}pngicons/crossed_swords.png" /> Your Turn`:`<img class="hero-icon-img" src="${V}pngicons/hourglass.png" /> Opponent's Turn`}</span>
           <span class="phase-label">${e.phase===`play`?`Play Phase`:`Attack Phase`}</span>
         </div>
-        <div class="action-buttons">
-          <button class="btn-back-menu" id="btn-back-menu">🏠 Menu</button>
+        <div class="action-buttons" id="action-buttons">
+          <button class="btn-back-menu" id="btn-back-menu">Menu</button>
           <button class="btn-mute" id="btn-mute">${ve()?`🔇`:`🔊`}</button>
           ${e.turn===`player`?`
             ${e.phase===`play`?`<button class="btn-phase" id="btn-attack-phase">Attack Phase →</button>`:``}
@@ -315,7 +315,7 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         <div class="hand-area player-hand" id="player-hand">
           ${e.player.hand.map(e=>U(e,`hand`)).join(``)}
         </div>
-        <div class="battlefield player-field" id="player-field">
+        <div class="battlefield player-field ${e.turn===`player`?`your-turn`:``}" id="player-field">
           ${e.player.board.map(e=>U(e,`board`)).join(``)}
           ${e.player.board.length,``}
         </div>
