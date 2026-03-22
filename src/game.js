@@ -377,6 +377,7 @@ async function opponentTurn() {
     c.exhausted = false
   })
   gameState.oppHeroAbilityUsed = false
+  import('./main.js').then(m => m.showTurnBanner("Opponent's Turn"))
   const existingAttackerUids = opp.board.map(c => c.uid)
 
   const cardsToPlay = pickCardsToPlay(opp.hand, opp.mana)
@@ -675,6 +676,15 @@ export function useHeroAbility() {
   } else if (effect === 'bloodprice') {
     gameState.log.push(`🩸 Blood Price: Click any creature to deal 3 damage to it.`)
   } else if (effect === 'unleash') {
+    const validTargets = gameState.player.board.filter(c => !c.keywords?.includes('Ambush'))
+    if (validTargets.length === 0) {
+      gameState.player.mana += hero.abilityCost
+      gameState.heroAbilityUsed = false
+      gameState._abilityTargeting = null
+      gameState.log.push(`<span class="log-damage">❌ No valid creatures to Unleash.</span>`)
+      import('./main.js').then(m => m.renderBoard())
+      return
+    }
     gameState.log.push(`⚡ Unleash: Click a friendly creature to give it Ambush.`)
   } else if (effect === 'glacialgrasp') {
     gameState.log.push(`❄️ Glacial Grasp: Click an enemy creature to exhaust it.`)
@@ -738,6 +748,13 @@ export function resolveAbilityTarget(uid) {
     playerCard.canAttack = true
     playerCard._unleashTemp = true
     gameState.log.push(`⚡ ${playerCard.name} gains Ambush from Unleash!`)
+    import('./main.js').then(m => {
+      const el = document.querySelector(`[data-uid="${playerCard.uid}"]`)
+      if (el) {
+        // Gold particle burst
+        m.createUnleashEffect(el)
+      }
+    })
   } else if (effect === 'glacialgrasp') {
     if (!opponentCard) return false
     opponentCard.exhausted = true

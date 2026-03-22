@@ -329,6 +329,52 @@ export function animateCardLunge(uid, direction = 'up') {
   })
 }
 
+export function createUnleashEffect(el) {
+  const rect = el.getBoundingClientRect()
+  const cx = rect.left + rect.width / 2
+  const cy = rect.top + rect.height / 2
+
+  // Ring of gold particles
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div')
+    p.style.cssText = `
+      position: fixed;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #fcd34d;
+      pointer-events: none;
+      z-index: 999;
+      left: ${cx}px;
+      top: ${cy}px;
+      box-shadow: 0 0 6px #fcd34d, 0 0 10px rgba(252,211,77,0.6);
+    `
+    document.body.appendChild(p)
+    const angle = (i / 14) * Math.PI * 2
+    const dist = 50 + Math.random() * 30
+    gsap.to(p, {
+      duration: 0.5 + Math.random() * 0.3,
+      x: Math.cos(angle) * dist,
+      y: Math.sin(angle) * dist,
+      opacity: 0,
+      scale: 0.2,
+      ease: 'power2.out',
+      onComplete: () => p.remove(),
+    })
+  }
+
+  // Flash on the card itself
+  gsap.fromTo(el,
+    { filter: 'brightness(1) drop-shadow(0 0 0px transparent)' },
+    {
+      filter: 'brightness(1.8) drop-shadow(0 0 16px rgba(252,211,77,0.9))',
+      duration: 0.2,
+      yoyo: true,
+      repeat: 1,
+      ease: 'power2.inOut',
+    }
+  )
+}
+
 export function showTurnBanner(text) {
   const existing = document.getElementById('turn-banner')
   if (existing) existing.remove()
