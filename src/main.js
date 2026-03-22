@@ -329,6 +329,36 @@ export function animateCardLunge(uid, direction = 'up') {
   })
 }
 
+export function showTurnBanner(text) {
+  const existing = document.getElementById('turn-banner')
+  if (existing) existing.remove()
+
+  const banner = document.createElement('div')
+  banner.id = 'turn-banner'
+  banner.innerHTML = `<span class="turn-banner-text">${text}</span>`
+  banner.className = 'turn-banner'
+  document.body.appendChild(banner)
+
+  gsap.fromTo(banner,
+    { opacity: 0, scaleX: 0.6, scaleY: 0.8 },
+    {
+      opacity: 1, scaleX: 1, scaleY: 1,
+      duration: 0.35,
+      ease: 'back.out(1.4)',
+      onComplete: () => {
+        gsap.to(banner, {
+          opacity: 0,
+          y: -20,
+          duration: 0.4,
+          delay: 0.9,
+          ease: 'power2.in',
+          onComplete: () => banner.remove()
+        })
+      }
+    }
+  )
+}
+
 export function animateHeroHit(side) {
   const el = document.querySelector(`.${side}-portrait`)
   if (!el) return
@@ -362,23 +392,34 @@ function renderGraveyardOverlay() {
     <div class="graveyard-overlay" id="graveyard-overlay">
       <div class="graveyard-panel">
         <div class="graveyard-header">
-          <div class="graveyard-title"><img class="hero-icon-img" src="${BASE}pngicons/skull.png" style="vertical-align:middle;margin-right:6px;" /> ${title}</div>
+          <div class="graveyard-title">${title}</div>
           <button class="graveyard-close" id="graveyard-close">✕</button>
         </div>
+        <div class="graveyard-count-line">${graveyard.length} card${graveyard.length !== 1 ? 's' : ''} in graveyard</div>
         <div class="graveyard-cards">
           ${graveyard.length === 0
             ? '<div class="graveyard-empty">No dead creatures yet</div>'
             : graveyard.map(card => `
               <div class="graveyard-card rarity-${card.rarity}">
-                <div class="thumb-image" style="width:80px;height:107px;position:relative;border-radius:6px;overflow:hidden;">
-                  <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
-                  <div class="thumb-frame" style="position:absolute;inset:0;">
+                <div style="position:relative;width:100px;height:140px;border-radius:8px;overflow:hidden;background:#111;box-shadow:0 4px 12px rgba(0,0,0,0.6);">
+                  <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+                  <div style="position:absolute;inset:0;z-index:5;pointer-events:none;">
                     <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
                   </div>
-                  <div style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a5fa0,#0a2040);border:1px solid #90cdf4;display:flex;align-items:center;justify-content:center;font-family:Barlow,sans-serif;font-size:10px;font-weight:700;color:#fff;z-index:10;">${card.mana}</div>
+                  <div style="position:absolute;top:3px;left:3px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;z-index:20;">
+                    <img src="${BASE}pngicons/mana.png" style="position:absolute;width:28px;height:28px;object-fit:contain;z-index:1;" />
+                    <span style="position:relative;z-index:3;font-family:Barlow,sans-serif;font-weight:900;font-size:11px;color:#fff;margin-top:4px;text-shadow:0 0 4px rgba(0,0,0,1),0 0 8px rgba(0,0,0,1),-1px -1px 0 rgba(0,0,0,1),1px 1px 0 rgba(0,0,0,1);">${card.mana}</span>
+                  </div>
+                  <div style="position:absolute;bottom:20px;left:3px;right:3px;z-index:20;text-align:center;font-family:'Passion One',sans-serif;font-size:9px;letter-spacing:0.5px;text-transform:uppercase;padding:2px 3px;border-radius:2px;background:rgba(0,0,0,0.75);color:#f0d080;">${card.name}</div>
+                  <div style="position:absolute;bottom:3px;left:3px;right:3px;display:flex;justify-content:space-between;z-index:20;">
+                    <div style="display:flex;align-items:center;gap:1px;font-family:Barlow,sans-serif;font-size:11px;font-weight:700;padding:1px 4px;border-radius:3px;background:rgba(5,5,5,0.92);border:1px solid rgba(180,40,40,0.6);color:#ff7070;">
+                      <img src="${BASE}pngicons/crossed_swords.png" style="width:9px;height:9px;" />${card.attack}
+                    </div>
+                    <div style="display:flex;align-items:center;gap:1px;font-family:Barlow,sans-serif;font-size:11px;font-weight:700;padding:1px 4px;border-radius:3px;background:rgba(5,5,5,0.92);border:1px solid rgba(180,20,40,0.6);color:#ff4466;">
+                      <img src="${BASE}pngicons/heart.png" style="width:9px;height:9px;" />${card.hp}
+                    </div>
+                  </div>
                 </div>
-                <div style="font-family:'Passion One',sans-serif;font-size:9px;color:#f0d080;text-align:center;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:80px;">${card.name}</div>
-                <div style="font-family:'Barlow',sans-serif;font-size:9px;text-align:center;color:rgba(255,255,255,0.4);">⚔️${card.attack} 🩸${card.hp}</div>
               </div>
             `).join('')
           }
@@ -546,90 +587,152 @@ function attachEvents() {
   document.getElementById('btn-hero-ability')?.addEventListener('click', () => {
     useHeroAbility()
   })
+
+  const abilityBtn = document.getElementById('btn-hero-ability')
+  abilityBtn?.addEventListener('mouseenter', () => {
+    const hero = gameState.hero
+    if (!hero) return
+    const existing = document.getElementById('hero-ability-tooltip')
+    if (existing) existing.remove()
+    const tip = document.createElement('div')
+    tip.id = 'hero-ability-tooltip'
+    tip.className = 'hero-ability-tooltip'
+    tip.style.borderColor = hero.borderColor
+    tip.innerHTML = `<div class="hero-ability-tooltip-text">${hero.abilityDesc}</div>`
+    document.body.appendChild(tip)
+    const rect = abilityBtn.getBoundingClientRect()
+    let left = rect.left + rect.width / 2 - 100
+    let top = rect.top - 60
+    if (left < 8) left = 8
+    if (top < 8) top = rect.bottom + 8
+    tip.style.left = `${left}px`
+    tip.style.top = `${top}px`
+  })
+
+  abilityBtn?.addEventListener('mouseleave', () => {
+    document.getElementById('hero-ability-tooltip')?.remove()
+  })
 }
 
 // ── OMEN MODAL
 export function showOmenModal(cards) {
-  // Remove any existing modal
   document.getElementById('omen-modal')?.remove()
 
   const modal = document.createElement('div')
   modal.id = 'omen-modal'
   modal.style.cssText = `
     position: fixed; inset: 0; z-index: 1000;
-    background: rgba(0,0,0,0.75);
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(6px);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 20px;
+    gap: 28px;
+    animation: screen-fade-in 0.2s ease-out;
   `
 
   modal.innerHTML = `
-    <div style="
-      font-family: 'Passion One', sans-serif;
-      font-size: 22px; color: #c9a84c;
-      text-transform: uppercase; letter-spacing: 2px;
-      text-shadow: 0 0 12px rgba(201,168,76,0.6);
-    ">🔮 Omen — Choose a card to keep on top</div>
-    <div style="font-family: Barlow, sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); margin-top: -12px;">
-      The other cards go to the bottom of your deck.
+    <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div style="
+        font-family:'Passion One',sans-serif;
+        font-size:32px;
+        color:#fcd34d;
+        text-transform:uppercase;
+        letter-spacing:4px;
+        text-shadow:0 0 20px rgba(252,211,77,0.5);
+      ">Omen</div>
+      <div style="
+        font-family:'Poppins',sans-serif;
+        font-size:12px;
+        color:rgba(255,255,255,0.4);
+        letter-spacing:2px;
+      ">Choose a card to keep on top of your deck</div>
+      <div style="
+        width:120px;height:1px;
+        background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent);
+        margin-top:4px;
+      "></div>
     </div>
-    <div id="omen-choices" style="display: flex; gap: 20px; align-items: center;">
+
+    <div id="omen-choices" style="display:flex;gap:24px;align-items:center;">
       ${cards.map(card => `
-        <div class="omen-card-choice card rarity-${card.rarity}" data-uid="${card.uid}" style="
-          cursor: pointer; position: relative;
-          width: 100px; height: 140px;
-          border-radius: 10px; overflow: hidden;
-          transition: transform 0.2s, box-shadow 0.2s;
-          box-shadow: 0 0 0px rgba(201,168,76,0);
+        <div class="omen-card-choice" data-uid="${card.uid}" style="
+          cursor:pointer;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:10px;
+          transition:transform 0.2s;
         ">
-          <div style="position:absolute;inset:0;z-index:1;">
-            <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;" />
-          </div>
-          <div style="position:absolute;inset:0;z-index:2;">
-            <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
-          </div>
-          <div style="position:absolute;top:3px;left:3px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;z-index:10;">
-            <img src="${BASE}pngicons/mana.png" style="position:absolute;width:36px;height:36px;object-fit:contain;" />
-            <span style="position:relative;z-index:2;font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#fff;text-shadow:0 0 6px rgba(0,0,0,1),0 0 12px rgba(0,0,0,1);margin-top:4px;">${card.mana}</span>
-          </div>
-          <div style="position:absolute;bottom:0;left:0;right:0;z-index:10;
-            background:linear-gradient(transparent,rgba(0,0,0,0.85));
-            padding:4px 4px 5px;text-align:center;">
-            <div style="font-family:'Passion One',sans-serif;font-size:9px;color:#f0d080;
-              text-transform:uppercase;letter-spacing:0.5px;
-              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              ${card.name}
+          <div style="
+            position:relative;
+            width:140px;height:196px;
+            border-radius:8px;
+            overflow:hidden;
+            box-shadow:0 8px 24px rgba(0,0,0,0.6);
+            background:#111;
+          ">
+            <img src="${BASE}cards/${card.image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+            <div style="position:absolute;inset:0;z-index:5;pointer-events:none;">
+              <img src="${BASE}${rarityFrames[card.rarity]}" style="width:100%;height:100%;object-fit:fill;" />
             </div>
-            <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px;">
-              <div style="display:flex;align-items:center;gap:2px;background:rgba(0,0,0,0.85);border:1px solid rgba(180,40,40,0.6);border-radius:4px;padding:2px 5px;">
-                <img src="${BASE}pngicons/crossed_swords.png" style="width:10px;height:10px;" />
-                <span style="font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#ff7070;text-shadow:0 0 6px rgba(0,0,0,1),0 2px 4px rgba(0,0,0,1);">${card.attack}</span>
+            <div style="position:absolute;top:4px;left:4px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;z-index:20;">
+              <img src="${BASE}pngicons/mana.png" style="position:absolute;width:36px;height:36px;object-fit:contain;z-index:1;" />
+              <span style="position:relative;z-index:3;font-family:Barlow,sans-serif;font-weight:900;font-size:13px;color:#fff;margin-top:0px;text-shadow:0 0 4px rgba(0,0,0,1),0 0 8px rgba(0,0,0,1),-1px -1px 0 rgba(0,0,0,1),1px 1px 0 rgba(0,0,0,1);">${card.mana}</span>
+            </div>
+            <div style="
+              position:absolute;bottom:28px;left:4px;right:4px;
+              z-index:20;text-align:center;
+              font-family:'Passion One',sans-serif;font-size:11px;
+              letter-spacing:0.8px;text-transform:uppercase;
+              padding:2px 4px;border-radius:2px;
+              background:rgba(0,0,0,0.7);
+              color:#f0d080;
+              text-shadow:0 1px 2px rgba(0,0,0,0.9);
+            ">${card.name}</div>
+            <div style="
+              position:absolute;bottom:4px;left:4px;right:4px;
+              display:flex;justify-content:space-between;z-index:20;
+            ">
+              <div style="display:flex;align-items:center;gap:2px;font-family:Barlow,sans-serif;font-size:14px;font-weight:700;padding:2px 5px;border-radius:4px;background:rgba(5,5,5,0.92);border:1px solid rgba(180,40,40,0.6);color:#ff7070;">
+                <img src="${BASE}pngicons/crossed_swords.png" style="width:12px;height:12px;" />${card.attack}
               </div>
-              <div style="display:flex;align-items:center;gap:2px;background:rgba(0,0,0,0.85);border:1px solid rgba(180,20,40,0.6);border-radius:4px;padding:2px 5px;">
-                <img src="${BASE}pngicons/heart.png" style="width:10px;height:10px;" />
-                <span style="font-family:Barlow,sans-serif;font-size:11px;font-weight:700;color:#ff4466;text-shadow:0 0 6px rgba(0,0,0,1),0 2px 4px rgba(0,0,0,1);">${card.hp}</span>
+              <div style="display:flex;align-items:center;gap:2px;font-family:Barlow,sans-serif;font-size:14px;font-weight:700;padding:2px 5px;border-radius:4px;background:rgba(5,5,5,0.92);border:1px solid rgba(180,20,40,0.6);color:#ff4466;">
+                <img src="${BASE}pngicons/heart.png" style="width:12px;height:12px;" />${card.hp}
               </div>
             </div>
           </div>
+          <div style="
+            font-family:'Poppins',sans-serif;
+            font-size:9px;
+            font-weight:600;
+            letter-spacing:2px;
+            text-transform:uppercase;
+            color:${card.rarity === 'legendary' ? '#fcd34d' : card.rarity === 'epic' ? '#c4b5fd' : card.rarity === 'rare' ? '#93c5fd' : '#6ee7b7'};
+          ">${card.rarity}</div>
         </div>
       `).join('')}
     </div>
-    <div style="font-family:Barlow,sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">
-      Click a card to place it on top of your deck
-    </div>
+
+    <div style="
+      font-family:'Poppins',sans-serif;
+      font-size:10px;
+      color:rgba(255,255,255,0.25);
+      letter-spacing:1px;
+    ">The other cards go to the bottom of your deck</div>
   `
 
   document.body.appendChild(modal)
 
-  // Hover glow effect
   modal.querySelectorAll('.omen-card-choice').forEach(el => {
     el.addEventListener('mouseenter', () => {
-      el.style.transform = 'scale(1.08) translateY(-4px)'
-      el.style.boxShadow = '0 0 20px rgba(201,168,76,0.7)'
+      el.style.transform = 'translateY(-8px) scale(1.04)'
+      const inner = el.querySelector('div')
+      if (inner) inner.style.boxShadow = '0 0 24px rgba(201,168,76,0.6), 0 12px 32px rgba(0,0,0,0.6)'
     })
     el.addEventListener('mouseleave', () => {
       el.style.transform = ''
-      el.style.boxShadow = '0 0 0px rgba(201,168,76,0)'
+      const inner = el.querySelector('div')
+      if (inner) inner.style.boxShadow = '0 8px 24px rgba(0,0,0,0.6)'
     })
     el.addEventListener('click', () => {
       const uid = parseInt(el.dataset.uid)

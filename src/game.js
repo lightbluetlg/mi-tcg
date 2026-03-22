@@ -558,6 +558,7 @@ async function opponentTurn() {
   playSound('turn')
   playSound('card_draw')
   gameState.log.push(`<span class="log-turn">🎮 Your turn! Mana: ${gameState.player.mana}</span>`)
+  import('./main.js').then(m => m.showTurnBanner('Your Turn'))
 
   import('./main.js').then(m => m.renderBoard())
 }
