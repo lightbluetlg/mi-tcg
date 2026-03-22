@@ -80,7 +80,7 @@ export function renderBoard() {
             <div class="hero-name" style="${gs.oppHero ? `color: ${gs.oppHero.borderColor};` : ''}">
               ${gs.selectedCard && gs.phase === 'attack' && gs.turn === 'player' ? 'Attack!' : gs.oppHero ? gs.oppHero.name : 'Opponent'}
             </div>
-            <div class="hero-hp"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.opponent.hp}</div>
+            <div class="hero-hp ${parseInt(gs.opponent.hp) <= 5 ? 'danger' : ''}"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.opponent.hp}</div>
           </div>
           <div class="mana-display">
             <span class="mana-label">MANA</span>
@@ -121,7 +121,7 @@ export function renderBoard() {
         <div class="hero-info">
           <div class="hero-portrait player-portrait" style="${gs.hero ? `border-color: ${gs.hero.borderColor}; box-shadow: 0 0 12px ${gs.hero.glowColor};` : ''}">
             <div class="hero-name" style="${gs.hero ? `color: ${gs.hero.borderColor};` : ''}">${gs.hero ? gs.hero.name : 'You'}</div>
-            <div class="hero-hp"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.player.hp}</div>
+            <div class="hero-hp ${parseInt(gs.player.hp) <= 5 ? 'danger' : ''}"><img class="hero-icon-img" src="${BASE}pngicons/heart.png" /> ${gs.player.hp}</div>
           </div>
           ${gs.hero && gs.turn === 'player' ? `
             <button class="btn-hero-ability ${gs.heroAbilityUsed ? 'used' : ''} ${gs._abilityTargeting ? 'targeting' : ''}"

@@ -108,6 +108,9 @@ body {
   font-weight: 700;
   color: #ff6b6b;
   text-shadow: 0 0 10px rgba(255,80,80,0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .mana-display {
@@ -2314,44 +2317,47 @@ body {
 .graveyard-icon {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   padding: 4px 10px;
   border-radius: 6px;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(80,20,20,0.25);
+  border: 1px solid rgba(255,80,80,0.2);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 14px;
+  backdrop-filter: blur(4px);
 }
 
 .graveyard-icon:hover {
-  border-color: rgba(255,80,80,0.4);
-  background: rgba(255,0,0,0.08);
+  border-color: rgba(255,80,80,0.5);
+  background: rgba(255,0,0,0.12);
+  box-shadow: 0 0 10px rgba(255,50,50,0.2);
 }
 
 .graveyard-count {
   font-family: 'Barlow', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,120,120,0.8);
 }
 
 .deck-icon {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   padding: 4px 10px;
   border-radius: 6px;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,20,40,0.35);
+  border: 1px solid rgba(96,165,250,0.2);
   font-size: 14px;
+  backdrop-filter: blur(4px);
 }
 
 .deck-count-display {
   font-family: 'Barlow', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: rgba(255,255,255,0.85);
+  color: rgba(147,197,253,0.85);
 }
 
 /* GRAVEYARD OVERLAY */
@@ -2741,4 +2747,22 @@ body {
   box-shadow:
     inset 0 0 30px rgba(239,68,68,0.12),
     0 0 20px rgba(239,68,68,0.08);
+}
+
+/* ══════════════════════════════
+   LOW HP WARNING
+══════════════════════════════ */
+.hero-hp.danger .hero-icon-img {
+  animation: hp-danger-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes hp-danger-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255,30,30,0.6));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(255,30,30,1));
+    transform: scale(1.25);
+  }
 }
