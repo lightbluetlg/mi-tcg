@@ -31,7 +31,7 @@ function savePlayerName(name) {
 }
 
 function getReadyDecks(decks) {
-  return decks.filter(d => d.cards && d.cards.length === 20)
+  return decks.filter(d => d.cards && d.cards.length === 30)
 }
 
 export function renderMenu() {
@@ -45,7 +45,7 @@ export function renderMenu() {
   }
 
   const selectedDeck = decks.find(d => d.slot === selectedSlot)
-  const canPlay = selectedMode === 'vs-ai' && selectedDeck && selectedDeck.cards && selectedDeck.cards.length === 20
+  const canPlay = selectedMode === 'vs-ai' && selectedDeck && selectedDeck.cards && selectedDeck.cards.length === 30
 
   document.querySelector('#app').innerHTML = `
     <div class="newmenu-screen">
@@ -114,7 +114,7 @@ export function renderMenu() {
           ${selectedMode === 'vs-ai' ? `
             <div class="center-decks">
               ${decks.map(d => {
-                const ready = d.cards && d.cards.length === 20
+                const ready = d.cards && d.cards.length === 30
                 const isSelected = d.slot === selectedSlot
                 const coverCard = d.coverId ? allCards.find(c => c.id === d.coverId) : null
                 const frame = coverCard ? rarityFrames[coverCard.rarity] : null

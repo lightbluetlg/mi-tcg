@@ -112,6 +112,10 @@ export function playCard(uid) {
     gameState.log.push(`<span class="log-damage">❌ Not enough mana to play ${card.name}.</span>`)
     return
   }
+  if (gameState.player.board.length >= 7) {
+    gameState.log.push(`<span class="log-damage">❌ Board is full — remove a creature first.</span>`)
+    return
+  }
   gameState.player.mana -= card.mana
   gameState.player.hand.splice(idx, 1)
 
@@ -385,6 +389,7 @@ async function opponentTurn() {
     const idx = opp.hand.findIndex(c => c.uid === card.uid)
     if (idx === -1) continue
     if (card.mana > opp.mana) continue
+    if (opp.board.length >= 7) continue
     opp.hand.splice(idx, 1)
     opp.mana -= card.mana
     card.canAttack = card.keywords?.includes('Ambush') ? true : false
@@ -553,7 +558,13 @@ async function opponentTurn() {
   }
 
   if (opp.deck.length > 0) {
-    opp.hand.push(opp.deck.shift())
+    const drawn = opp.deck.shift()
+    if (opp.hand.length >= 8) {
+      opp.graveyard.push({...drawn})
+      gameState.log.push(`<span class="log-death">Opponent's hand is full — ${drawn.name} was milled!</span>`)
+    } else {
+      opp.hand.push(drawn)
+    }
   } else {
     opp.fatigueDamage += 1
     opp.hp -= opp.fatigueDamage
@@ -578,7 +589,13 @@ async function opponentTurn() {
   gameState.player.board.forEach(c => { c.canAttack = true; c.exhausted = false })
 
   if (gameState.player.deck.length > 0) {
-    gameState.player.hand.push(gameState.player.deck.shift())
+    const drawn = gameState.player.deck.shift()
+    if (gameState.player.hand.length >= 8) {
+      gameState.player.graveyard.push({...drawn})
+      gameState.log.push(`<span class="log-death">Hand is full — ${drawn.name} was milled!</span>`)
+    } else {
+      gameState.player.hand.push(drawn)
+    }
   } else {
     gameState.player.fatigueDamage += 1
     gameState.player.hp -= gameState.player.fatigueDamage
@@ -660,8 +677,14 @@ export function freshGame(slot = 1, heroId = null) {
   // Serafine passive: draw 1 extra card on first turn
   if (hero?.id === 'serafine' && fresh.turn === 'player') {
     if (fresh.player.deck.length > 0) {
-      fresh.player.hand.push(fresh.player.deck.shift())
-      fresh.log.push(`💜 Serafine's passive: You draw an extra card!`)
+      const drawn = fresh.player.deck.shift()
+      if (fresh.player.hand.length >= 8) {
+        fresh.player.graveyard.push({...drawn})
+        fresh.log.push(`💜 Serafine's passive: Hand full — ${drawn.name} was milled!`)
+      } else {
+        fresh.player.hand.push(drawn)
+        fresh.log.push(`💜 Serafine's passive: You draw an extra card!`)
+      }
     }
   }
 

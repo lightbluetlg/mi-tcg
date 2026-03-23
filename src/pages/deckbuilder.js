@@ -3,7 +3,7 @@ import { allCards } from '../cards.js'
 import { BASE } from '../constants.js'
 
 const MAX_COPIES = 2
-const DECK_SIZE = 20
+const DECK_SIZE = 30
 const MAX_DECKS = 5
 
 export function getDeckKey(slot) {
