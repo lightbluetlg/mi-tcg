@@ -411,11 +411,28 @@ body {
   bottom: 12px;
   left: 16px;
   width: 320px;
+  max-height: 180px;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  pointer-events: none;
+  overflow-y: auto;
+  pointer-events: all;
   z-index: 100;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,168,76,0.3) transparent;
+}
+
+.message-log::-webkit-scrollbar {
+  width: 4px;
+}
+
+.message-log::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-log::-webkit-scrollbar-thumb {
+  background: rgba(201,168,76,0.3);
+  border-radius: 2px;
 }
 
 .log-entry {

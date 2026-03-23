@@ -177,7 +177,8 @@ export function renderBoard() {
   `
   const logEl = document.getElementById('message-log')
   if (logEl) {
-    logEl.innerHTML = gs.log.slice(-4).map(m => {
+    const wasAtBottom = logEl.scrollTop + logEl.clientHeight >= logEl.scrollHeight - 10
+    logEl.innerHTML = gs.log.slice(-20).map(m => {
       const clean = m.replace(/<[^>]+>/g, '')
       let cls = ''
       if (clean.includes('💀') || clean.includes('died') || clean.includes('Fatigue') || clean.includes('lost')) cls = 'log-death'
@@ -187,6 +188,7 @@ export function renderBoard() {
       else cls = 'log-special'
       return `<div class="log-entry ${cls}">${clean}</div>`
     }).join('')
+    if (wasAtBottom) logEl.scrollTop = logEl.scrollHeight
   }
   attachEvents()
 }

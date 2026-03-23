@@ -389,10 +389,40 @@ async function opponentTurn() {
     opp.mana -= card.mana
     card.canAttack = card.keywords?.includes('Ambush') ? true : false
     card.exhausted = false
+
+    // Hero passives on opponent play
+    if (gameState.oppHero) {
+      if (gameState.oppHero.id === 'skorn' && card.keywords?.includes('Warden')) {
+        card.hp += 1
+        card.currentHp += 1
+      }
+      if (gameState.oppHero.id === 'djinn' && card.keywords?.includes('Ambush')) {
+        card.attack += 1
+      }
+    }
+
     gameState.log.push(`<span class="log-special">🤖 Opponent played ${card.name}.</span>`)
     playSound('card_play')
     await animateCardPlayedFromHand(card, true)
     opp.board.push(card)
+
+    // If Ambush, add to attacker list immediately
+    if (card.canAttack) {
+      existingAttackerUids.push(card.uid)
+    }
+
+    // If Omen, trigger for opponent too
+    if (card.keywords?.includes('Omen')) {
+      const revealed = opp.deck.splice(0, Math.min(3, opp.deck.length))
+      if (revealed.length > 0) {
+        const best = revealed.reduce((b, c) => cardValue(c) > cardValue(b) ? c : b)
+        const rest = revealed.filter(c => c.uid !== best.uid)
+        opp.deck.unshift(best)
+        opp.deck.push(...rest)
+        gameState.log.push(`<span class="log-special">🤖 Opponent's Omen triggers!</span>`)
+      }
+    }
+
     import('./main.js').then(m => m.renderBoard())
     await new Promise(r => setTimeout(r, 300))
   }
